@@ -384,10 +384,10 @@ def is_time(t, format_string='%H:%M:%S'):
 		True if the string represents a valid time, False otherwise.
 
 	Example:
-		is_time('12:34:56')  # True
-		is_time('12:34:56 AM')  # False (because it includes AM/PM)
-		is_time('12:34:56.123')  # True (allows milliseconds)
-		is_time('12:34')  # False (missing seconds)
+		is_time('12:34:56') # True
+		is_time('12:34:56 AM') # False (because it includes AM/PM)
+		is_time('12:34:56.123') # True (allows milliseconds)
+		is_time('12:34') # False (missing seconds)
 	"""
 	try:
 		# Attempt to parse the string using the given format
@@ -449,5 +449,225 @@ def weekday_name(s, format_string='%d/%m/%Y'):
 	"""
 	d = str2datetime(s, format_string=format_string)
 	return d.strftime('%A')
+
+#------------------------------------------------------------------------------
+# Numeric
+#------------------------------------------------------------------------------
+
+def isnan(number):
+	"""
+	Checks if a number is NaN (Not a Number). 
+
+	Args:
+		number: The number to check.
+
+	Returns:
+		True if the number is NaN, False otherwise.
+
+	Example:
+		isnan(float('nan'))  # True
+		isnan(1.0)         # False
+		isnan(None)        # False (None is not a number)
+
+	Important Note: 
+		While this approach works for checking NaN in Python, it's worth noting that 
+		math.isnan is a dedicated function provided by the math module for this purpose. 
+		It's recommended to use math.isnan for more explicit and robust NaN checks.
+	"""
+	return number != number
+
+def is_numeric(literal):
+	"""
+	Checks if a given string represents a numeric value.
+	Credits: http://www.rosettacode.org/wiki/Determine_if_a_string_is_numeric#Python
+
+	Args:
+		literal: The string to check.
+
+	Returns:
+		True if the string represents a numeric value, False otherwise.
+
+	Example:
+		is_numeric("123")     # True (integer)
+		is_numeric("12.34")   # True (float)
+		is_numeric("1.23e+5") # True (scientific notation)
+		is_numeric("0x1A")    # True (hexadecimal)
+		is_numeric("0b101")   # True (binary)
+		is_numeric("0o123")   # True (octal)
+		is_numeric("abc")     # False
+	"""
+	castings = [int, float, complex,
+			lambda s: int(s, 2), #binary
+			lambda s: int(s, 8), #octal
+			lambda s: int(s,16)  #hex
+		]
+	for cast in castings:
+		try:
+			cast(literal)
+			return True
+		except ValueError:
+			pass
+
+	return False
+
+def is_integer(number):
+	"""
+	Checks if a number is an integer.
+
+	Args:
+		number: The number to check.
+
+	Returns:
+		True if the number is an integer, False otherwise.
+
+	Example:
+		is_integer(10)   # True
+		is_integer(10.5) # False
+		is_integer("10") # False (string)
+		is_integer(10.0) # True (float with no decimal part)
+	"""
+	try:
+		return number == int(number)
+	except ValueError:
+		return False
+
+def is_numeric_and_integer(arg):
+	"""
+	Checks if a given argument is both numeric and an integer.
+
+	Args:
+		arg: The argument to check.
+
+	Returns:
+		True if the argument is both numeric and an integer, False otherwise.
+
+	Example:
+		is_numeric_and_integer("123")  # True
+		is_numeric_and_integer("12.3") # False (numeric but not an integer)
+		is_numeric_and_integer("abc")  # False (not numeric)
+		is_numeric_and_integer(123)    # True
+		is_numeric_and_integer(12.3)   # False
+	"""
+	try:
+		if is_numeric(arg):
+			return is_integer(int(arg))
+	except ValueError:
+		pass
+	
+	return False
+
+def is_float(number):
+	"""
+	Checks if a number is a float (floating-point number).
+
+	Args:
+		number: The number to check.
+
+	Returns:
+		True if the number is a float, False otherwise.
+
+	Example:
+		is_float(10.5)     # True
+		is_float(10)       # True (integer can be represented as a float)
+		is_float("10.5")   # False (string)
+	"""
+	try:
+		return number == float(number)
+	except ValueError:
+		return False
+
+def is_number_regex(s):
+	"""
+	Checks if a string represents a numeric value using regular expressions.
+
+	Args:
+		s: The string to check.
+
+	Returns:
+		True if the string represents a numeric value, False otherwise.
+
+	Example:
+		is_number_regex("123")      # True (integer)
+		is_number_regex("12.34")    # True (float)
+		is_number_regex("1.23e+5")  # False (scientific notation not handled)
+		is_number_regex("0x1A")     # False (hexadecimal not handled)
+		is_number_regex("0b101")    # False (binary not handled)
+		is_number_regex("0o123")    # False (octal not handled)
+		is_number_regex("abc")      # False
+	"""
+	if re.match("^\d+?\.\d+?$", s) is None:
+		return s.isdigit()
+	return True
+
+def is_number_repl_isdigit(s):
+	"""
+	Checks if a string represents a numeric value using string manipulation.
+
+	Args:
+		s: The string to check.
+
+	Returns:
+		True if the string represents a numeric value, False otherwise.
+
+	Example:
+		is_number_repl_isdigit("123")   # True (integer)
+		is_number_repl_isdigit("12.34") # True (float)
+		is_number_regex("1.23e+5")      # False (scientific notation not handled)
+		is_number_regex("0x1A")         # False (hexadecimal not handled)
+		is_number_regex("0b101")        # False (binary not handled)
+		is_number_regex("0o123")        # False (octal not handled)
+		is_number_regex("abc")          # False
+	"""
+	return s.replace('.','',1).isdigit()
+
+def to_int(element):
+	"""
+	Attempts to convert a given element to an integer. 
+
+	Args:
+		element: The element to convert.
+
+	Returns:
+		The integer representation of the element if successful, otherwise NaN.
+
+	Example:
+		to_int("123")  # 123
+		to_int("12.3") # NaN
+		to_int("abc")  # NaN
+		to_int(123)    # 123
+	"""
+	n = math.nan
+
+	try:
+		n = int(element)
+	except:
+		pass
+
+	return n
+
+def format_float(arg, decimals=2):
+	"""
+	Formats a float value to remove trailing zeros and the decimal point if unnecessary,
+	allowing for customization of the number of decimal places.
+
+	Args:
+		arg: The float value to format.
+		decimals: The number of decimal places to display. Defaults to 2.
+
+	Returns:
+		The formatted string representation of the float.
+
+	Example:
+		format_float(12.3456) # "12.35"
+		format_float(12.0) # "12"
+		format_float(12.000) # "12"
+		format_float(12.3456, decimals=3) # "12.346"
+		format_float(12.3456, decimals=0) # "12"
+	"""
+	return f"{arg:.{decimals}f}".rstrip("0").rstrip(".")
+
+#------------------------------------------------------------------------------
+# Lists
+#------------------------------------------------------------------------------
 
 #EOF
