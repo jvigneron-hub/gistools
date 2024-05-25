@@ -89,6 +89,33 @@
             <li>
                     <a class="function" href="#weekday_name">weekday_name</a>
             </li>
+            <li>
+                    <a class="function" href="#isnan">isnan</a>
+            </li>
+            <li>
+                    <a class="function" href="#is_numeric">is_numeric</a>
+            </li>
+            <li>
+                    <a class="function" href="#is_integer">is_integer</a>
+            </li>
+            <li>
+                    <a class="function" href="#is_numeric_and_integer">is_numeric_and_integer</a>
+            </li>
+            <li>
+                    <a class="function" href="#is_float">is_float</a>
+            </li>
+            <li>
+                    <a class="function" href="#is_number_regex">is_number_regex</a>
+            </li>
+            <li>
+                    <a class="function" href="#is_number_repl_isdigit">is_number_repl_isdigit</a>
+            </li>
+            <li>
+                    <a class="function" href="#to_int">to_int</a>
+            </li>
+            <li>
+                    <a class="function" href="#format_float">format_float</a>
+            </li>
     </ul>
 
 
@@ -496,10 +523,10 @@ gistools<wbr>.utils    </h1>
 </span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a><span class="sd">		True if the string represents a valid time, False otherwise.</span>
 </span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a><span class="sd">	Example:</span>
-</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a><span class="sd">		is_time(&#39;12:34:56&#39;)  # True</span>
-</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a><span class="sd">		is_time(&#39;12:34:56 AM&#39;)  # False (because it includes AM/PM)</span>
-</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a><span class="sd">		is_time(&#39;12:34:56.123&#39;)  # True (allows milliseconds)</span>
-</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a><span class="sd">		is_time(&#39;12:34&#39;)  # False (missing seconds)</span>
+</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a><span class="sd">		is_time(&#39;12:34:56&#39;) # True</span>
+</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a><span class="sd">		is_time(&#39;12:34:56 AM&#39;) # False (because it includes AM/PM)</span>
+</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a><span class="sd">		is_time(&#39;12:34:56.123&#39;) # True (allows milliseconds)</span>
+</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a><span class="sd">		is_time(&#39;12:34&#39;) # False (missing seconds)</span>
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a><span class="sd">	&quot;&quot;&quot;</span>
 </span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>	<span class="k">try</span><span class="p">:</span>
 </span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>		<span class="c1"># Attempt to parse the string using the given format</span>
@@ -562,7 +589,227 @@ gistools<wbr>.utils    </h1>
 </span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a>	<span class="n">d</span> <span class="o">=</span> <span class="n">str2datetime</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">format_string</span><span class="o">=</span><span class="n">format_string</span><span class="p">)</span>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>	<span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%A&#39;</span><span class="p">)</span>
 </span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>
-</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="c1">#EOF</span>
+</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="c1">#------------------------------------------------------------------------------</span>
+</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a><span class="c1"># Numeric</span>
+</span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a><span class="c1">#------------------------------------------------------------------------------</span>
+</span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a>
+</span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a><span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+</span><span id="L-458"><a href="#L-458"><span class="linenos">458</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-459"><a href="#L-459"><span class="linenos">459</span></a><span class="sd">	Checks if a number is NaN (Not a Number). </span>
+</span><span id="L-460"><a href="#L-460"><span class="linenos">460</span></a>
+</span><span id="L-461"><a href="#L-461"><span class="linenos">461</span></a><span class="sd">	Args:</span>
+</span><span id="L-462"><a href="#L-462"><span class="linenos">462</span></a><span class="sd">		number: The number to check.</span>
+</span><span id="L-463"><a href="#L-463"><span class="linenos">463</span></a>
+</span><span id="L-464"><a href="#L-464"><span class="linenos">464</span></a><span class="sd">	Returns:</span>
+</span><span id="L-465"><a href="#L-465"><span class="linenos">465</span></a><span class="sd">		True if the number is NaN, False otherwise.</span>
+</span><span id="L-466"><a href="#L-466"><span class="linenos">466</span></a>
+</span><span id="L-467"><a href="#L-467"><span class="linenos">467</span></a><span class="sd">	Example:</span>
+</span><span id="L-468"><a href="#L-468"><span class="linenos">468</span></a><span class="sd">		isnan(float(&#39;nan&#39;))  # True</span>
+</span><span id="L-469"><a href="#L-469"><span class="linenos">469</span></a><span class="sd">		isnan(1.0)         # False</span>
+</span><span id="L-470"><a href="#L-470"><span class="linenos">470</span></a><span class="sd">		isnan(None)        # False (None is not a number)</span>
+</span><span id="L-471"><a href="#L-471"><span class="linenos">471</span></a>
+</span><span id="L-472"><a href="#L-472"><span class="linenos">472</span></a><span class="sd">	Important Note: </span>
+</span><span id="L-473"><a href="#L-473"><span class="linenos">473</span></a><span class="sd">		While this approach works for checking NaN in Python, it&#39;s worth noting that </span>
+</span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a><span class="sd">		math.isnan is a dedicated function provided by the math module for this purpose. </span>
+</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a><span class="sd">		It&#39;s recommended to use math.isnan for more explicit and robust NaN checks.</span>
+</span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a>	<span class="k">return</span> <span class="n">number</span> <span class="o">!=</span> <span class="n">number</span>
+</span><span id="L-478"><a href="#L-478"><span class="linenos">478</span></a>
+</span><span id="L-479"><a href="#L-479"><span class="linenos">479</span></a><span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">literal</span><span class="p">):</span>
+</span><span id="L-480"><a href="#L-480"><span class="linenos">480</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-481"><a href="#L-481"><span class="linenos">481</span></a><span class="sd">	Checks if a given string represents a numeric value.</span>
+</span><span id="L-482"><a href="#L-482"><span class="linenos">482</span></a><span class="sd">	Credits: http://www.rosettacode.org/wiki/Determine_if_a_string_is_numeric#Python</span>
+</span><span id="L-483"><a href="#L-483"><span class="linenos">483</span></a>
+</span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a><span class="sd">	Args:</span>
+</span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a><span class="sd">		literal: The string to check.</span>
+</span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a>
+</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a><span class="sd">	Returns:</span>
+</span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="sd">		True if the string represents a numeric value, False otherwise.</span>
+</span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a>
+</span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a><span class="sd">	Example:</span>
+</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a><span class="sd">		is_numeric(&quot;123&quot;)     # True (integer)</span>
+</span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a><span class="sd">		is_numeric(&quot;12.34&quot;)   # True (float)</span>
+</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="sd">		is_numeric(&quot;1.23e+5&quot;) # True (scientific notation)</span>
+</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a><span class="sd">		is_numeric(&quot;0x1A&quot;)    # True (hexadecimal)</span>
+</span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a><span class="sd">		is_numeric(&quot;0b101&quot;)   # True (binary)</span>
+</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a><span class="sd">		is_numeric(&quot;0o123&quot;)   # True (octal)</span>
+</span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a><span class="sd">		is_numeric(&quot;abc&quot;)     # False</span>
+</span><span id="L-498"><a href="#L-498"><span class="linenos">498</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a>	<span class="n">castings</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">,</span>
+</span><span id="L-500"><a href="#L-500"><span class="linenos">500</span></a>			<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="c1">#binary</span>
+</span><span id="L-501"><a href="#L-501"><span class="linenos">501</span></a>			<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="c1">#octal</span>
+</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a>			<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>  <span class="c1">#hex</span>
+</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a>		<span class="p">]</span>
+</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>	<span class="k">for</span> <span class="n">cast</span> <span class="ow">in</span> <span class="n">castings</span><span class="p">:</span>
+</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>		<span class="k">try</span><span class="p">:</span>
+</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>			<span class="n">cast</span><span class="p">(</span><span class="n">literal</span><span class="p">)</span>
+</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a>			<span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>			<span class="k">pass</span>
+</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>
+</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>	<span class="k">return</span> <span class="kc">False</span>
+</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>
+</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a><span class="k">def</span> <span class="nf">is_integer</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a><span class="sd">	Checks if a number is an integer.</span>
+</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>
+</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a><span class="sd">	Args:</span>
+</span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a><span class="sd">		number: The number to check.</span>
+</span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a>
+</span><span id="L-520"><a href="#L-520"><span class="linenos">520</span></a><span class="sd">	Returns:</span>
+</span><span id="L-521"><a href="#L-521"><span class="linenos">521</span></a><span class="sd">		True if the number is an integer, False otherwise.</span>
+</span><span id="L-522"><a href="#L-522"><span class="linenos">522</span></a>
+</span><span id="L-523"><a href="#L-523"><span class="linenos">523</span></a><span class="sd">	Example:</span>
+</span><span id="L-524"><a href="#L-524"><span class="linenos">524</span></a><span class="sd">		is_integer(10)   # True</span>
+</span><span id="L-525"><a href="#L-525"><span class="linenos">525</span></a><span class="sd">		is_integer(10.5) # False</span>
+</span><span id="L-526"><a href="#L-526"><span class="linenos">526</span></a><span class="sd">		is_integer(&quot;10&quot;) # False (string)</span>
+</span><span id="L-527"><a href="#L-527"><span class="linenos">527</span></a><span class="sd">		is_integer(10.0) # True (float with no decimal part)</span>
+</span><span id="L-528"><a href="#L-528"><span class="linenos">528</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-529"><a href="#L-529"><span class="linenos">529</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="L-530"><a href="#L-530"><span class="linenos">530</span></a>		<span class="k">return</span> <span class="n">number</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span id="L-531"><a href="#L-531"><span class="linenos">531</span></a>	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="L-532"><a href="#L-532"><span class="linenos">532</span></a>		<span class="k">return</span> <span class="kc">False</span>
+</span><span id="L-533"><a href="#L-533"><span class="linenos">533</span></a>
+</span><span id="L-534"><a href="#L-534"><span class="linenos">534</span></a><span class="k">def</span> <span class="nf">is_numeric_and_integer</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+</span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a><span class="sd">	Checks if a given argument is both numeric and an integer.</span>
+</span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a>
+</span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a><span class="sd">	Args:</span>
+</span><span id="L-539"><a href="#L-539"><span class="linenos">539</span></a><span class="sd">		arg: The argument to check.</span>
+</span><span id="L-540"><a href="#L-540"><span class="linenos">540</span></a>
+</span><span id="L-541"><a href="#L-541"><span class="linenos">541</span></a><span class="sd">	Returns:</span>
+</span><span id="L-542"><a href="#L-542"><span class="linenos">542</span></a><span class="sd">		True if the argument is both numeric and an integer, False otherwise.</span>
+</span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>
+</span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a><span class="sd">	Example:</span>
+</span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a><span class="sd">		is_numeric_and_integer(&quot;123&quot;)  # True</span>
+</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="sd">		is_numeric_and_integer(&quot;12.3&quot;) # False (numeric but not an integer)</span>
+</span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a><span class="sd">		is_numeric_and_integer(&quot;abc&quot;)  # False (not numeric)</span>
+</span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">		is_numeric_and_integer(123)    # True</span>
+</span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a><span class="sd">		is_numeric_and_integer(12.3)   # False</span>
+</span><span id="L-550"><a href="#L-550"><span class="linenos">550</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a>		<span class="k">if</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+</span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a>			<span class="k">return</span> <span class="n">is_integer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>		<span class="k">pass</span>
+</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>	
+</span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>	<span class="k">return</span> <span class="kc">False</span>
+</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>
+</span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a><span class="k">def</span> <span class="nf">is_float</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+</span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a><span class="sd">	Checks if a number is a float (floating-point number).</span>
+</span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a>
+</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a><span class="sd">	Args:</span>
+</span><span id="L-564"><a href="#L-564"><span class="linenos">564</span></a><span class="sd">		number: The number to check.</span>
+</span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a>
+</span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a><span class="sd">	Returns:</span>
+</span><span id="L-567"><a href="#L-567"><span class="linenos">567</span></a><span class="sd">		True if the number is a float, False otherwise.</span>
+</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a>
+</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a><span class="sd">	Example:</span>
+</span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a><span class="sd">		is_float(10.5)     # True</span>
+</span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a><span class="sd">		is_float(10)       # True (integer can be represented as a float)</span>
+</span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a><span class="sd">		is_float(&quot;10.5&quot;)   # False (string)</span>
+</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>		<span class="k">return</span> <span class="n">number</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a>		<span class="k">return</span> <span class="kc">False</span>
+</span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a>
+</span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a><span class="k">def</span> <span class="nf">is_number_regex</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a><span class="sd">	Checks if a string represents a numeric value using regular expressions.</span>
+</span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a>
+</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a><span class="sd">	Args:</span>
+</span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a><span class="sd">		s: The string to check.</span>
+</span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a>
+</span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a><span class="sd">	Returns:</span>
+</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a><span class="sd">		True if the string represents a numeric value, False otherwise.</span>
+</span><span id="L-588"><a href="#L-588"><span class="linenos">588</span></a>
+</span><span id="L-589"><a href="#L-589"><span class="linenos">589</span></a><span class="sd">	Example:</span>
+</span><span id="L-590"><a href="#L-590"><span class="linenos">590</span></a><span class="sd">		is_number_regex(&quot;123&quot;)      # True (integer)</span>
+</span><span id="L-591"><a href="#L-591"><span class="linenos">591</span></a><span class="sd">		is_number_regex(&quot;12.34&quot;)    # True (float)</span>
+</span><span id="L-592"><a href="#L-592"><span class="linenos">592</span></a><span class="sd">		is_number_regex(&quot;1.23e+5&quot;)  # False (scientific notation not handled)</span>
+</span><span id="L-593"><a href="#L-593"><span class="linenos">593</span></a><span class="sd">		is_number_regex(&quot;0x1A&quot;)     # False (hexadecimal not handled)</span>
+</span><span id="L-594"><a href="#L-594"><span class="linenos">594</span></a><span class="sd">		is_number_regex(&quot;0b101&quot;)    # False (binary not handled)</span>
+</span><span id="L-595"><a href="#L-595"><span class="linenos">595</span></a><span class="sd">		is_number_regex(&quot;0o123&quot;)    # False (octal not handled)</span>
+</span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a><span class="sd">		is_number_regex(&quot;abc&quot;)      # False</span>
+</span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>	<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^\d+?\.\d+?$&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a>		<span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+</span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a>	<span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a>
+</span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a><span class="k">def</span> <span class="nf">is_number_repl_isdigit</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span><span id="L-603"><a href="#L-603"><span class="linenos">603</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a><span class="sd">	Checks if a string represents a numeric value using string manipulation.</span>
+</span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a>
+</span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a><span class="sd">	Args:</span>
+</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a><span class="sd">		s: The string to check.</span>
+</span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a>
+</span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a><span class="sd">	Returns:</span>
+</span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a><span class="sd">		True if the string represents a numeric value, False otherwise.</span>
+</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>
+</span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a><span class="sd">	Example:</span>
+</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a><span class="sd">		is_number_repl_isdigit(&quot;123&quot;)   # True (integer)</span>
+</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a><span class="sd">		is_number_repl_isdigit(&quot;12.34&quot;) # True (float)</span>
+</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a><span class="sd">		is_number_regex(&quot;1.23e+5&quot;)      # False (scientific notation not handled)</span>
+</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a><span class="sd">		is_number_regex(&quot;0x1A&quot;)         # False (hexadecimal not handled)</span>
+</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a><span class="sd">		is_number_regex(&quot;0b101&quot;)        # False (binary not handled)</span>
+</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a><span class="sd">		is_number_regex(&quot;0o123&quot;)        # False (octal not handled)</span>
+</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a><span class="sd">		is_number_regex(&quot;abc&quot;)          # False</span>
+</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>	<span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a>
+</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a><span class="k">def</span> <span class="nf">to_int</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-625"><a href="#L-625"><span class="linenos">625</span></a><span class="sd">	Attempts to convert a given element to an integer. </span>
+</span><span id="L-626"><a href="#L-626"><span class="linenos">626</span></a>
+</span><span id="L-627"><a href="#L-627"><span class="linenos">627</span></a><span class="sd">	Args:</span>
+</span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a><span class="sd">		element: The element to convert.</span>
+</span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a>
+</span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a><span class="sd">	Returns:</span>
+</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="sd">		The integer representation of the element if successful, otherwise NaN.</span>
+</span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a>
+</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a><span class="sd">	Example:</span>
+</span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a><span class="sd">		to_int(&quot;123&quot;)  # 123</span>
+</span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a><span class="sd">		to_int(&quot;12.3&quot;) # NaN</span>
+</span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a><span class="sd">		to_int(&quot;abc&quot;)  # NaN</span>
+</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a><span class="sd">		to_int(123)    # 123</span>
+</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a>	<span class="n">n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+</span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a>
+</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="L-642"><a href="#L-642"><span class="linenos">642</span></a>		<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+</span><span id="L-643"><a href="#L-643"><span class="linenos">643</span></a>	<span class="k">except</span><span class="p">:</span>
+</span><span id="L-644"><a href="#L-644"><span class="linenos">644</span></a>		<span class="k">pass</span>
+</span><span id="L-645"><a href="#L-645"><span class="linenos">645</span></a>
+</span><span id="L-646"><a href="#L-646"><span class="linenos">646</span></a>	<span class="k">return</span> <span class="n">n</span>
+</span><span id="L-647"><a href="#L-647"><span class="linenos">647</span></a>
+</span><span id="L-648"><a href="#L-648"><span class="linenos">648</span></a><span class="k">def</span> <span class="nf">format_float</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+</span><span id="L-649"><a href="#L-649"><span class="linenos">649</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-650"><a href="#L-650"><span class="linenos">650</span></a><span class="sd">	Formats a float value to remove trailing zeros and the decimal point if unnecessary,</span>
+</span><span id="L-651"><a href="#L-651"><span class="linenos">651</span></a><span class="sd">	allowing for customization of the number of decimal places.</span>
+</span><span id="L-652"><a href="#L-652"><span class="linenos">652</span></a>
+</span><span id="L-653"><a href="#L-653"><span class="linenos">653</span></a><span class="sd">	Args:</span>
+</span><span id="L-654"><a href="#L-654"><span class="linenos">654</span></a><span class="sd">		arg: The float value to format.</span>
+</span><span id="L-655"><a href="#L-655"><span class="linenos">655</span></a><span class="sd">		decimals: The number of decimal places to display. Defaults to 2.</span>
+</span><span id="L-656"><a href="#L-656"><span class="linenos">656</span></a>
+</span><span id="L-657"><a href="#L-657"><span class="linenos">657</span></a><span class="sd">	Returns:</span>
+</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a><span class="sd">		The formatted string representation of the float.</span>
+</span><span id="L-659"><a href="#L-659"><span class="linenos">659</span></a>
+</span><span id="L-660"><a href="#L-660"><span class="linenos">660</span></a><span class="sd">	Example:</span>
+</span><span id="L-661"><a href="#L-661"><span class="linenos">661</span></a><span class="sd">		format_float(12.3456) # &quot;12.35&quot;</span>
+</span><span id="L-662"><a href="#L-662"><span class="linenos">662</span></a><span class="sd">		format_float(12.0) # &quot;12&quot;</span>
+</span><span id="L-663"><a href="#L-663"><span class="linenos">663</span></a><span class="sd">		format_float(12.000) # &quot;12&quot;</span>
+</span><span id="L-664"><a href="#L-664"><span class="linenos">664</span></a><span class="sd">		format_float(12.3456, decimals=3) # &quot;12.346&quot;</span>
+</span><span id="L-665"><a href="#L-665"><span class="linenos">665</span></a><span class="sd">		format_float(12.3456, decimals=0) # &quot;12&quot;</span>
+</span><span id="L-666"><a href="#L-666"><span class="linenos">666</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="L-667"><a href="#L-667"><span class="linenos">667</span></a>	<span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimals</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+</span><span id="L-668"><a href="#L-668"><span class="linenos">668</span></a>
+</span><span id="L-669"><a href="#L-669"><span class="linenos">669</span></a><span class="c1">#------------------------------------------------------------------------------</span>
+</span><span id="L-670"><a href="#L-670"><span class="linenos">670</span></a><span class="c1"># Lists</span>
+</span><span id="L-671"><a href="#L-671"><span class="linenos">671</span></a><span class="c1">#------------------------------------------------------------------------------</span>
+</span><span id="L-672"><a href="#L-672"><span class="linenos">672</span></a>
+</span><span id="L-673"><a href="#L-673"><span class="linenos">673</span></a><span class="c1">#EOF</span>
 </span></pre></div>
 
 
@@ -1434,10 +1681,10 @@ ending with double underscores) using list comprehension.</p>
 </span><span id="is_time-385"><a href="#is_time-385"><span class="linenos">385</span></a><span class="sd">		True if the string represents a valid time, False otherwise.</span>
 </span><span id="is_time-386"><a href="#is_time-386"><span class="linenos">386</span></a>
 </span><span id="is_time-387"><a href="#is_time-387"><span class="linenos">387</span></a><span class="sd">	Example:</span>
-</span><span id="is_time-388"><a href="#is_time-388"><span class="linenos">388</span></a><span class="sd">		is_time(&#39;12:34:56&#39;)  # True</span>
-</span><span id="is_time-389"><a href="#is_time-389"><span class="linenos">389</span></a><span class="sd">		is_time(&#39;12:34:56 AM&#39;)  # False (because it includes AM/PM)</span>
-</span><span id="is_time-390"><a href="#is_time-390"><span class="linenos">390</span></a><span class="sd">		is_time(&#39;12:34:56.123&#39;)  # True (allows milliseconds)</span>
-</span><span id="is_time-391"><a href="#is_time-391"><span class="linenos">391</span></a><span class="sd">		is_time(&#39;12:34&#39;)  # False (missing seconds)</span>
+</span><span id="is_time-388"><a href="#is_time-388"><span class="linenos">388</span></a><span class="sd">		is_time(&#39;12:34:56&#39;) # True</span>
+</span><span id="is_time-389"><a href="#is_time-389"><span class="linenos">389</span></a><span class="sd">		is_time(&#39;12:34:56 AM&#39;) # False (because it includes AM/PM)</span>
+</span><span id="is_time-390"><a href="#is_time-390"><span class="linenos">390</span></a><span class="sd">		is_time(&#39;12:34:56.123&#39;) # True (allows milliseconds)</span>
+</span><span id="is_time-391"><a href="#is_time-391"><span class="linenos">391</span></a><span class="sd">		is_time(&#39;12:34&#39;) # False (missing seconds)</span>
 </span><span id="is_time-392"><a href="#is_time-392"><span class="linenos">392</span></a><span class="sd">	&quot;&quot;&quot;</span>
 </span><span id="is_time-393"><a href="#is_time-393"><span class="linenos">393</span></a>	<span class="k">try</span><span class="p">:</span>
 </span><span id="is_time-394"><a href="#is_time-394"><span class="linenos">394</span></a>		<span class="c1"># Attempt to parse the string using the given format</span>
@@ -1460,10 +1707,10 @@ ending with double underscores) using list comprehension.</p>
         True if the string represents a valid time, False otherwise.</p>
 
 <p>Example:
-        is_time('12:34:56')  # True
-        is_time('12:34:56 AM')  # False (because it includes AM/PM)
-        is_time('12:34:56.123')  # True (allows milliseconds)
-        is_time('12:34')  # False (missing seconds)</p>
+        is_time('12:34:56') # True
+        is_time('12:34:56 AM') # False (because it includes AM/PM)
+        is_time('12:34:56.123') # True (allows milliseconds)
+        is_time('12:34') # False (missing seconds)</p>
 </div>
 
 
@@ -1603,6 +1850,505 @@ ending with double underscores) using list comprehension.</p>
 <p>Example:
         weekday_name('26/10/2023') 
         # Output: 'Wednesday'</p>
+</div>
+
+
+                </section>
+                <section id="isnan">
+                            <input id="isnan-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">isnan</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">number</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="isnan-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#isnan"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isnan-458"><a href="#isnan-458"><span class="linenos">458</span></a><span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+</span><span id="isnan-459"><a href="#isnan-459"><span class="linenos">459</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="isnan-460"><a href="#isnan-460"><span class="linenos">460</span></a><span class="sd">	Checks if a number is NaN (Not a Number). </span>
+</span><span id="isnan-461"><a href="#isnan-461"><span class="linenos">461</span></a>
+</span><span id="isnan-462"><a href="#isnan-462"><span class="linenos">462</span></a><span class="sd">	Args:</span>
+</span><span id="isnan-463"><a href="#isnan-463"><span class="linenos">463</span></a><span class="sd">		number: The number to check.</span>
+</span><span id="isnan-464"><a href="#isnan-464"><span class="linenos">464</span></a>
+</span><span id="isnan-465"><a href="#isnan-465"><span class="linenos">465</span></a><span class="sd">	Returns:</span>
+</span><span id="isnan-466"><a href="#isnan-466"><span class="linenos">466</span></a><span class="sd">		True if the number is NaN, False otherwise.</span>
+</span><span id="isnan-467"><a href="#isnan-467"><span class="linenos">467</span></a>
+</span><span id="isnan-468"><a href="#isnan-468"><span class="linenos">468</span></a><span class="sd">	Example:</span>
+</span><span id="isnan-469"><a href="#isnan-469"><span class="linenos">469</span></a><span class="sd">		isnan(float(&#39;nan&#39;))  # True</span>
+</span><span id="isnan-470"><a href="#isnan-470"><span class="linenos">470</span></a><span class="sd">		isnan(1.0)         # False</span>
+</span><span id="isnan-471"><a href="#isnan-471"><span class="linenos">471</span></a><span class="sd">		isnan(None)        # False (None is not a number)</span>
+</span><span id="isnan-472"><a href="#isnan-472"><span class="linenos">472</span></a>
+</span><span id="isnan-473"><a href="#isnan-473"><span class="linenos">473</span></a><span class="sd">	Important Note: </span>
+</span><span id="isnan-474"><a href="#isnan-474"><span class="linenos">474</span></a><span class="sd">		While this approach works for checking NaN in Python, it&#39;s worth noting that </span>
+</span><span id="isnan-475"><a href="#isnan-475"><span class="linenos">475</span></a><span class="sd">		math.isnan is a dedicated function provided by the math module for this purpose. </span>
+</span><span id="isnan-476"><a href="#isnan-476"><span class="linenos">476</span></a><span class="sd">		It&#39;s recommended to use math.isnan for more explicit and robust NaN checks.</span>
+</span><span id="isnan-477"><a href="#isnan-477"><span class="linenos">477</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="isnan-478"><a href="#isnan-478"><span class="linenos">478</span></a>	<span class="k">return</span> <span class="n">number</span> <span class="o">!=</span> <span class="n">number</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a number is NaN (Not a Number). </p>
+
+<p>Args:
+        number: The number to check.</p>
+
+<p>Returns:
+        True if the number is NaN, False otherwise.</p>
+
+<p>Example:
+        isnan(float('nan'))  # True
+        isnan(1.0)         # False
+        isnan(None)        # False (None is not a number)</p>
+
+<p>Important Note: 
+        While this approach works for checking NaN in Python, it's worth noting that 
+        math.isnan is a dedicated function provided by the math module for this purpose. 
+        It's recommended to use math.isnan for more explicit and robust NaN checks.</p>
+</div>
+
+
+                </section>
+                <section id="is_numeric">
+                            <input id="is_numeric-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_numeric</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">literal</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="is_numeric-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_numeric"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_numeric-480"><a href="#is_numeric-480"><span class="linenos">480</span></a><span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">literal</span><span class="p">):</span>
+</span><span id="is_numeric-481"><a href="#is_numeric-481"><span class="linenos">481</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="is_numeric-482"><a href="#is_numeric-482"><span class="linenos">482</span></a><span class="sd">	Checks if a given string represents a numeric value.</span>
+</span><span id="is_numeric-483"><a href="#is_numeric-483"><span class="linenos">483</span></a><span class="sd">	Credits: http://www.rosettacode.org/wiki/Determine_if_a_string_is_numeric#Python</span>
+</span><span id="is_numeric-484"><a href="#is_numeric-484"><span class="linenos">484</span></a>
+</span><span id="is_numeric-485"><a href="#is_numeric-485"><span class="linenos">485</span></a><span class="sd">	Args:</span>
+</span><span id="is_numeric-486"><a href="#is_numeric-486"><span class="linenos">486</span></a><span class="sd">		literal: The string to check.</span>
+</span><span id="is_numeric-487"><a href="#is_numeric-487"><span class="linenos">487</span></a>
+</span><span id="is_numeric-488"><a href="#is_numeric-488"><span class="linenos">488</span></a><span class="sd">	Returns:</span>
+</span><span id="is_numeric-489"><a href="#is_numeric-489"><span class="linenos">489</span></a><span class="sd">		True if the string represents a numeric value, False otherwise.</span>
+</span><span id="is_numeric-490"><a href="#is_numeric-490"><span class="linenos">490</span></a>
+</span><span id="is_numeric-491"><a href="#is_numeric-491"><span class="linenos">491</span></a><span class="sd">	Example:</span>
+</span><span id="is_numeric-492"><a href="#is_numeric-492"><span class="linenos">492</span></a><span class="sd">		is_numeric(&quot;123&quot;)     # True (integer)</span>
+</span><span id="is_numeric-493"><a href="#is_numeric-493"><span class="linenos">493</span></a><span class="sd">		is_numeric(&quot;12.34&quot;)   # True (float)</span>
+</span><span id="is_numeric-494"><a href="#is_numeric-494"><span class="linenos">494</span></a><span class="sd">		is_numeric(&quot;1.23e+5&quot;) # True (scientific notation)</span>
+</span><span id="is_numeric-495"><a href="#is_numeric-495"><span class="linenos">495</span></a><span class="sd">		is_numeric(&quot;0x1A&quot;)    # True (hexadecimal)</span>
+</span><span id="is_numeric-496"><a href="#is_numeric-496"><span class="linenos">496</span></a><span class="sd">		is_numeric(&quot;0b101&quot;)   # True (binary)</span>
+</span><span id="is_numeric-497"><a href="#is_numeric-497"><span class="linenos">497</span></a><span class="sd">		is_numeric(&quot;0o123&quot;)   # True (octal)</span>
+</span><span id="is_numeric-498"><a href="#is_numeric-498"><span class="linenos">498</span></a><span class="sd">		is_numeric(&quot;abc&quot;)     # False</span>
+</span><span id="is_numeric-499"><a href="#is_numeric-499"><span class="linenos">499</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="is_numeric-500"><a href="#is_numeric-500"><span class="linenos">500</span></a>	<span class="n">castings</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">,</span>
+</span><span id="is_numeric-501"><a href="#is_numeric-501"><span class="linenos">501</span></a>			<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="c1">#binary</span>
+</span><span id="is_numeric-502"><a href="#is_numeric-502"><span class="linenos">502</span></a>			<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="c1">#octal</span>
+</span><span id="is_numeric-503"><a href="#is_numeric-503"><span class="linenos">503</span></a>			<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>  <span class="c1">#hex</span>
+</span><span id="is_numeric-504"><a href="#is_numeric-504"><span class="linenos">504</span></a>		<span class="p">]</span>
+</span><span id="is_numeric-505"><a href="#is_numeric-505"><span class="linenos">505</span></a>	<span class="k">for</span> <span class="n">cast</span> <span class="ow">in</span> <span class="n">castings</span><span class="p">:</span>
+</span><span id="is_numeric-506"><a href="#is_numeric-506"><span class="linenos">506</span></a>		<span class="k">try</span><span class="p">:</span>
+</span><span id="is_numeric-507"><a href="#is_numeric-507"><span class="linenos">507</span></a>			<span class="n">cast</span><span class="p">(</span><span class="n">literal</span><span class="p">)</span>
+</span><span id="is_numeric-508"><a href="#is_numeric-508"><span class="linenos">508</span></a>			<span class="k">return</span> <span class="kc">True</span>
+</span><span id="is_numeric-509"><a href="#is_numeric-509"><span class="linenos">509</span></a>		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="is_numeric-510"><a href="#is_numeric-510"><span class="linenos">510</span></a>			<span class="k">pass</span>
+</span><span id="is_numeric-511"><a href="#is_numeric-511"><span class="linenos">511</span></a>
+</span><span id="is_numeric-512"><a href="#is_numeric-512"><span class="linenos">512</span></a>	<span class="k">return</span> <span class="kc">False</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a given string represents a numeric value.
+Credits: <a href="http://www.rosettacode.org/wiki/Determine_if_a_string_is_numeric#Python">http://www.rosettacode.org/wiki/Determine_if_a_string_is_numeric#Python</a></p>
+
+<p>Args:
+        literal: The string to check.</p>
+
+<p>Returns:
+        True if the string represents a numeric value, False otherwise.</p>
+
+<p>Example:
+        is_numeric("123")     # True (integer)
+        is_numeric("12.34")   # True (float)
+        is_numeric("1.23e+5") # True (scientific notation)
+        is_numeric("0x1A")    # True (hexadecimal)
+        is_numeric("0b101")   # True (binary)
+        is_numeric("0o123")   # True (octal)
+        is_numeric("abc")     # False</p>
+</div>
+
+
+                </section>
+                <section id="is_integer">
+                            <input id="is_integer-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">number</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="is_integer-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_integer"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_integer-514"><a href="#is_integer-514"><span class="linenos">514</span></a><span class="k">def</span> <span class="nf">is_integer</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+</span><span id="is_integer-515"><a href="#is_integer-515"><span class="linenos">515</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="is_integer-516"><a href="#is_integer-516"><span class="linenos">516</span></a><span class="sd">	Checks if a number is an integer.</span>
+</span><span id="is_integer-517"><a href="#is_integer-517"><span class="linenos">517</span></a>
+</span><span id="is_integer-518"><a href="#is_integer-518"><span class="linenos">518</span></a><span class="sd">	Args:</span>
+</span><span id="is_integer-519"><a href="#is_integer-519"><span class="linenos">519</span></a><span class="sd">		number: The number to check.</span>
+</span><span id="is_integer-520"><a href="#is_integer-520"><span class="linenos">520</span></a>
+</span><span id="is_integer-521"><a href="#is_integer-521"><span class="linenos">521</span></a><span class="sd">	Returns:</span>
+</span><span id="is_integer-522"><a href="#is_integer-522"><span class="linenos">522</span></a><span class="sd">		True if the number is an integer, False otherwise.</span>
+</span><span id="is_integer-523"><a href="#is_integer-523"><span class="linenos">523</span></a>
+</span><span id="is_integer-524"><a href="#is_integer-524"><span class="linenos">524</span></a><span class="sd">	Example:</span>
+</span><span id="is_integer-525"><a href="#is_integer-525"><span class="linenos">525</span></a><span class="sd">		is_integer(10)   # True</span>
+</span><span id="is_integer-526"><a href="#is_integer-526"><span class="linenos">526</span></a><span class="sd">		is_integer(10.5) # False</span>
+</span><span id="is_integer-527"><a href="#is_integer-527"><span class="linenos">527</span></a><span class="sd">		is_integer(&quot;10&quot;) # False (string)</span>
+</span><span id="is_integer-528"><a href="#is_integer-528"><span class="linenos">528</span></a><span class="sd">		is_integer(10.0) # True (float with no decimal part)</span>
+</span><span id="is_integer-529"><a href="#is_integer-529"><span class="linenos">529</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="is_integer-530"><a href="#is_integer-530"><span class="linenos">530</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="is_integer-531"><a href="#is_integer-531"><span class="linenos">531</span></a>		<span class="k">return</span> <span class="n">number</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span id="is_integer-532"><a href="#is_integer-532"><span class="linenos">532</span></a>	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="is_integer-533"><a href="#is_integer-533"><span class="linenos">533</span></a>		<span class="k">return</span> <span class="kc">False</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a number is an integer.</p>
+
+<p>Args:
+        number: The number to check.</p>
+
+<p>Returns:
+        True if the number is an integer, False otherwise.</p>
+
+<p>Example:
+        is_integer(10)   # True
+        is_integer(10.5) # False
+        is_integer("10") # False (string)
+        is_integer(10.0) # True (float with no decimal part)</p>
+</div>
+
+
+                </section>
+                <section id="is_numeric_and_integer">
+                            <input id="is_numeric_and_integer-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_numeric_and_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">arg</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="is_numeric_and_integer-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_numeric_and_integer"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_numeric_and_integer-535"><a href="#is_numeric_and_integer-535"><span class="linenos">535</span></a><span class="k">def</span> <span class="nf">is_numeric_and_integer</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+</span><span id="is_numeric_and_integer-536"><a href="#is_numeric_and_integer-536"><span class="linenos">536</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="is_numeric_and_integer-537"><a href="#is_numeric_and_integer-537"><span class="linenos">537</span></a><span class="sd">	Checks if a given argument is both numeric and an integer.</span>
+</span><span id="is_numeric_and_integer-538"><a href="#is_numeric_and_integer-538"><span class="linenos">538</span></a>
+</span><span id="is_numeric_and_integer-539"><a href="#is_numeric_and_integer-539"><span class="linenos">539</span></a><span class="sd">	Args:</span>
+</span><span id="is_numeric_and_integer-540"><a href="#is_numeric_and_integer-540"><span class="linenos">540</span></a><span class="sd">		arg: The argument to check.</span>
+</span><span id="is_numeric_and_integer-541"><a href="#is_numeric_and_integer-541"><span class="linenos">541</span></a>
+</span><span id="is_numeric_and_integer-542"><a href="#is_numeric_and_integer-542"><span class="linenos">542</span></a><span class="sd">	Returns:</span>
+</span><span id="is_numeric_and_integer-543"><a href="#is_numeric_and_integer-543"><span class="linenos">543</span></a><span class="sd">		True if the argument is both numeric and an integer, False otherwise.</span>
+</span><span id="is_numeric_and_integer-544"><a href="#is_numeric_and_integer-544"><span class="linenos">544</span></a>
+</span><span id="is_numeric_and_integer-545"><a href="#is_numeric_and_integer-545"><span class="linenos">545</span></a><span class="sd">	Example:</span>
+</span><span id="is_numeric_and_integer-546"><a href="#is_numeric_and_integer-546"><span class="linenos">546</span></a><span class="sd">		is_numeric_and_integer(&quot;123&quot;)  # True</span>
+</span><span id="is_numeric_and_integer-547"><a href="#is_numeric_and_integer-547"><span class="linenos">547</span></a><span class="sd">		is_numeric_and_integer(&quot;12.3&quot;) # False (numeric but not an integer)</span>
+</span><span id="is_numeric_and_integer-548"><a href="#is_numeric_and_integer-548"><span class="linenos">548</span></a><span class="sd">		is_numeric_and_integer(&quot;abc&quot;)  # False (not numeric)</span>
+</span><span id="is_numeric_and_integer-549"><a href="#is_numeric_and_integer-549"><span class="linenos">549</span></a><span class="sd">		is_numeric_and_integer(123)    # True</span>
+</span><span id="is_numeric_and_integer-550"><a href="#is_numeric_and_integer-550"><span class="linenos">550</span></a><span class="sd">		is_numeric_and_integer(12.3)   # False</span>
+</span><span id="is_numeric_and_integer-551"><a href="#is_numeric_and_integer-551"><span class="linenos">551</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="is_numeric_and_integer-552"><a href="#is_numeric_and_integer-552"><span class="linenos">552</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="is_numeric_and_integer-553"><a href="#is_numeric_and_integer-553"><span class="linenos">553</span></a>		<span class="k">if</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+</span><span id="is_numeric_and_integer-554"><a href="#is_numeric_and_integer-554"><span class="linenos">554</span></a>			<span class="k">return</span> <span class="n">is_integer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+</span><span id="is_numeric_and_integer-555"><a href="#is_numeric_and_integer-555"><span class="linenos">555</span></a>	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="is_numeric_and_integer-556"><a href="#is_numeric_and_integer-556"><span class="linenos">556</span></a>		<span class="k">pass</span>
+</span><span id="is_numeric_and_integer-557"><a href="#is_numeric_and_integer-557"><span class="linenos">557</span></a>	
+</span><span id="is_numeric_and_integer-558"><a href="#is_numeric_and_integer-558"><span class="linenos">558</span></a>	<span class="k">return</span> <span class="kc">False</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a given argument is both numeric and an integer.</p>
+
+<p>Args:
+        arg: The argument to check.</p>
+
+<p>Returns:
+        True if the argument is both numeric and an integer, False otherwise.</p>
+
+<p>Example:
+        is_numeric_and_integer("123")  # True
+        is_numeric_and_integer("12.3") # False (numeric but not an integer)
+        is_numeric_and_integer("abc")  # False (not numeric)
+        is_numeric_and_integer(123)    # True
+        is_numeric_and_integer(12.3)   # False</p>
+</div>
+
+
+                </section>
+                <section id="is_float">
+                            <input id="is_float-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_float</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">number</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="is_float-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_float"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_float-560"><a href="#is_float-560"><span class="linenos">560</span></a><span class="k">def</span> <span class="nf">is_float</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+</span><span id="is_float-561"><a href="#is_float-561"><span class="linenos">561</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="is_float-562"><a href="#is_float-562"><span class="linenos">562</span></a><span class="sd">	Checks if a number is a float (floating-point number).</span>
+</span><span id="is_float-563"><a href="#is_float-563"><span class="linenos">563</span></a>
+</span><span id="is_float-564"><a href="#is_float-564"><span class="linenos">564</span></a><span class="sd">	Args:</span>
+</span><span id="is_float-565"><a href="#is_float-565"><span class="linenos">565</span></a><span class="sd">		number: The number to check.</span>
+</span><span id="is_float-566"><a href="#is_float-566"><span class="linenos">566</span></a>
+</span><span id="is_float-567"><a href="#is_float-567"><span class="linenos">567</span></a><span class="sd">	Returns:</span>
+</span><span id="is_float-568"><a href="#is_float-568"><span class="linenos">568</span></a><span class="sd">		True if the number is a float, False otherwise.</span>
+</span><span id="is_float-569"><a href="#is_float-569"><span class="linenos">569</span></a>
+</span><span id="is_float-570"><a href="#is_float-570"><span class="linenos">570</span></a><span class="sd">	Example:</span>
+</span><span id="is_float-571"><a href="#is_float-571"><span class="linenos">571</span></a><span class="sd">		is_float(10.5)     # True</span>
+</span><span id="is_float-572"><a href="#is_float-572"><span class="linenos">572</span></a><span class="sd">		is_float(10)       # True (integer can be represented as a float)</span>
+</span><span id="is_float-573"><a href="#is_float-573"><span class="linenos">573</span></a><span class="sd">		is_float(&quot;10.5&quot;)   # False (string)</span>
+</span><span id="is_float-574"><a href="#is_float-574"><span class="linenos">574</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="is_float-575"><a href="#is_float-575"><span class="linenos">575</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="is_float-576"><a href="#is_float-576"><span class="linenos">576</span></a>		<span class="k">return</span> <span class="n">number</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span id="is_float-577"><a href="#is_float-577"><span class="linenos">577</span></a>	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="is_float-578"><a href="#is_float-578"><span class="linenos">578</span></a>		<span class="k">return</span> <span class="kc">False</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a number is a float (floating-point number).</p>
+
+<p>Args:
+        number: The number to check.</p>
+
+<p>Returns:
+        True if the number is a float, False otherwise.</p>
+
+<p>Example:
+        is_float(10.5)     # True
+        is_float(10)       # True (integer can be represented as a float)
+        is_float("10.5")   # False (string)</p>
+</div>
+
+
+                </section>
+                <section id="is_number_regex">
+                            <input id="is_number_regex-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_number_regex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">s</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="is_number_regex-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_number_regex"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_number_regex-580"><a href="#is_number_regex-580"><span class="linenos">580</span></a><span class="k">def</span> <span class="nf">is_number_regex</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span><span id="is_number_regex-581"><a href="#is_number_regex-581"><span class="linenos">581</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="is_number_regex-582"><a href="#is_number_regex-582"><span class="linenos">582</span></a><span class="sd">	Checks if a string represents a numeric value using regular expressions.</span>
+</span><span id="is_number_regex-583"><a href="#is_number_regex-583"><span class="linenos">583</span></a>
+</span><span id="is_number_regex-584"><a href="#is_number_regex-584"><span class="linenos">584</span></a><span class="sd">	Args:</span>
+</span><span id="is_number_regex-585"><a href="#is_number_regex-585"><span class="linenos">585</span></a><span class="sd">		s: The string to check.</span>
+</span><span id="is_number_regex-586"><a href="#is_number_regex-586"><span class="linenos">586</span></a>
+</span><span id="is_number_regex-587"><a href="#is_number_regex-587"><span class="linenos">587</span></a><span class="sd">	Returns:</span>
+</span><span id="is_number_regex-588"><a href="#is_number_regex-588"><span class="linenos">588</span></a><span class="sd">		True if the string represents a numeric value, False otherwise.</span>
+</span><span id="is_number_regex-589"><a href="#is_number_regex-589"><span class="linenos">589</span></a>
+</span><span id="is_number_regex-590"><a href="#is_number_regex-590"><span class="linenos">590</span></a><span class="sd">	Example:</span>
+</span><span id="is_number_regex-591"><a href="#is_number_regex-591"><span class="linenos">591</span></a><span class="sd">		is_number_regex(&quot;123&quot;)      # True (integer)</span>
+</span><span id="is_number_regex-592"><a href="#is_number_regex-592"><span class="linenos">592</span></a><span class="sd">		is_number_regex(&quot;12.34&quot;)    # True (float)</span>
+</span><span id="is_number_regex-593"><a href="#is_number_regex-593"><span class="linenos">593</span></a><span class="sd">		is_number_regex(&quot;1.23e+5&quot;)  # False (scientific notation not handled)</span>
+</span><span id="is_number_regex-594"><a href="#is_number_regex-594"><span class="linenos">594</span></a><span class="sd">		is_number_regex(&quot;0x1A&quot;)     # False (hexadecimal not handled)</span>
+</span><span id="is_number_regex-595"><a href="#is_number_regex-595"><span class="linenos">595</span></a><span class="sd">		is_number_regex(&quot;0b101&quot;)    # False (binary not handled)</span>
+</span><span id="is_number_regex-596"><a href="#is_number_regex-596"><span class="linenos">596</span></a><span class="sd">		is_number_regex(&quot;0o123&quot;)    # False (octal not handled)</span>
+</span><span id="is_number_regex-597"><a href="#is_number_regex-597"><span class="linenos">597</span></a><span class="sd">		is_number_regex(&quot;abc&quot;)      # False</span>
+</span><span id="is_number_regex-598"><a href="#is_number_regex-598"><span class="linenos">598</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="is_number_regex-599"><a href="#is_number_regex-599"><span class="linenos">599</span></a>	<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^\d+?\.\d+?$&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="is_number_regex-600"><a href="#is_number_regex-600"><span class="linenos">600</span></a>		<span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+</span><span id="is_number_regex-601"><a href="#is_number_regex-601"><span class="linenos">601</span></a>	<span class="k">return</span> <span class="kc">True</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a string represents a numeric value using regular expressions.</p>
+
+<p>Args:
+        s: The string to check.</p>
+
+<p>Returns:
+        True if the string represents a numeric value, False otherwise.</p>
+
+<p>Example:
+        is_number_regex("123")      # True (integer)
+        is_number_regex("12.34")    # True (float)
+        is_number_regex("1.23e+5")  # False (scientific notation not handled)
+        is_number_regex("0x1A")     # False (hexadecimal not handled)
+        is_number_regex("0b101")    # False (binary not handled)
+        is_number_regex("0o123")    # False (octal not handled)
+        is_number_regex("abc")      # False</p>
+</div>
+
+
+                </section>
+                <section id="is_number_repl_isdigit">
+                            <input id="is_number_repl_isdigit-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">is_number_repl_isdigit</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">s</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="is_number_repl_isdigit-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#is_number_repl_isdigit"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is_number_repl_isdigit-603"><a href="#is_number_repl_isdigit-603"><span class="linenos">603</span></a><span class="k">def</span> <span class="nf">is_number_repl_isdigit</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span><span id="is_number_repl_isdigit-604"><a href="#is_number_repl_isdigit-604"><span class="linenos">604</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="is_number_repl_isdigit-605"><a href="#is_number_repl_isdigit-605"><span class="linenos">605</span></a><span class="sd">	Checks if a string represents a numeric value using string manipulation.</span>
+</span><span id="is_number_repl_isdigit-606"><a href="#is_number_repl_isdigit-606"><span class="linenos">606</span></a>
+</span><span id="is_number_repl_isdigit-607"><a href="#is_number_repl_isdigit-607"><span class="linenos">607</span></a><span class="sd">	Args:</span>
+</span><span id="is_number_repl_isdigit-608"><a href="#is_number_repl_isdigit-608"><span class="linenos">608</span></a><span class="sd">		s: The string to check.</span>
+</span><span id="is_number_repl_isdigit-609"><a href="#is_number_repl_isdigit-609"><span class="linenos">609</span></a>
+</span><span id="is_number_repl_isdigit-610"><a href="#is_number_repl_isdigit-610"><span class="linenos">610</span></a><span class="sd">	Returns:</span>
+</span><span id="is_number_repl_isdigit-611"><a href="#is_number_repl_isdigit-611"><span class="linenos">611</span></a><span class="sd">		True if the string represents a numeric value, False otherwise.</span>
+</span><span id="is_number_repl_isdigit-612"><a href="#is_number_repl_isdigit-612"><span class="linenos">612</span></a>
+</span><span id="is_number_repl_isdigit-613"><a href="#is_number_repl_isdigit-613"><span class="linenos">613</span></a><span class="sd">	Example:</span>
+</span><span id="is_number_repl_isdigit-614"><a href="#is_number_repl_isdigit-614"><span class="linenos">614</span></a><span class="sd">		is_number_repl_isdigit(&quot;123&quot;)   # True (integer)</span>
+</span><span id="is_number_repl_isdigit-615"><a href="#is_number_repl_isdigit-615"><span class="linenos">615</span></a><span class="sd">		is_number_repl_isdigit(&quot;12.34&quot;) # True (float)</span>
+</span><span id="is_number_repl_isdigit-616"><a href="#is_number_repl_isdigit-616"><span class="linenos">616</span></a><span class="sd">		is_number_regex(&quot;1.23e+5&quot;)      # False (scientific notation not handled)</span>
+</span><span id="is_number_repl_isdigit-617"><a href="#is_number_repl_isdigit-617"><span class="linenos">617</span></a><span class="sd">		is_number_regex(&quot;0x1A&quot;)         # False (hexadecimal not handled)</span>
+</span><span id="is_number_repl_isdigit-618"><a href="#is_number_repl_isdigit-618"><span class="linenos">618</span></a><span class="sd">		is_number_regex(&quot;0b101&quot;)        # False (binary not handled)</span>
+</span><span id="is_number_repl_isdigit-619"><a href="#is_number_repl_isdigit-619"><span class="linenos">619</span></a><span class="sd">		is_number_regex(&quot;0o123&quot;)        # False (octal not handled)</span>
+</span><span id="is_number_repl_isdigit-620"><a href="#is_number_repl_isdigit-620"><span class="linenos">620</span></a><span class="sd">		is_number_regex(&quot;abc&quot;)          # False</span>
+</span><span id="is_number_repl_isdigit-621"><a href="#is_number_repl_isdigit-621"><span class="linenos">621</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="is_number_repl_isdigit-622"><a href="#is_number_repl_isdigit-622"><span class="linenos">622</span></a>	<span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Checks if a string represents a numeric value using string manipulation.</p>
+
+<p>Args:
+        s: The string to check.</p>
+
+<p>Returns:
+        True if the string represents a numeric value, False otherwise.</p>
+
+<p>Example:
+        is_number_repl_isdigit("123")   # True (integer)
+        is_number_repl_isdigit("12.34") # True (float)
+        is_number_regex("1.23e+5")      # False (scientific notation not handled)
+        is_number_regex("0x1A")         # False (hexadecimal not handled)
+        is_number_regex("0b101")        # False (binary not handled)
+        is_number_regex("0o123")        # False (octal not handled)
+        is_number_regex("abc")          # False</p>
+</div>
+
+
+                </section>
+                <section id="to_int">
+                            <input id="to_int-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">to_int</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">element</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="to_int-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#to_int"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="to_int-624"><a href="#to_int-624"><span class="linenos">624</span></a><span class="k">def</span> <span class="nf">to_int</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+</span><span id="to_int-625"><a href="#to_int-625"><span class="linenos">625</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="to_int-626"><a href="#to_int-626"><span class="linenos">626</span></a><span class="sd">	Attempts to convert a given element to an integer. </span>
+</span><span id="to_int-627"><a href="#to_int-627"><span class="linenos">627</span></a>
+</span><span id="to_int-628"><a href="#to_int-628"><span class="linenos">628</span></a><span class="sd">	Args:</span>
+</span><span id="to_int-629"><a href="#to_int-629"><span class="linenos">629</span></a><span class="sd">		element: The element to convert.</span>
+</span><span id="to_int-630"><a href="#to_int-630"><span class="linenos">630</span></a>
+</span><span id="to_int-631"><a href="#to_int-631"><span class="linenos">631</span></a><span class="sd">	Returns:</span>
+</span><span id="to_int-632"><a href="#to_int-632"><span class="linenos">632</span></a><span class="sd">		The integer representation of the element if successful, otherwise NaN.</span>
+</span><span id="to_int-633"><a href="#to_int-633"><span class="linenos">633</span></a>
+</span><span id="to_int-634"><a href="#to_int-634"><span class="linenos">634</span></a><span class="sd">	Example:</span>
+</span><span id="to_int-635"><a href="#to_int-635"><span class="linenos">635</span></a><span class="sd">		to_int(&quot;123&quot;)  # 123</span>
+</span><span id="to_int-636"><a href="#to_int-636"><span class="linenos">636</span></a><span class="sd">		to_int(&quot;12.3&quot;) # NaN</span>
+</span><span id="to_int-637"><a href="#to_int-637"><span class="linenos">637</span></a><span class="sd">		to_int(&quot;abc&quot;)  # NaN</span>
+</span><span id="to_int-638"><a href="#to_int-638"><span class="linenos">638</span></a><span class="sd">		to_int(123)    # 123</span>
+</span><span id="to_int-639"><a href="#to_int-639"><span class="linenos">639</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="to_int-640"><a href="#to_int-640"><span class="linenos">640</span></a>	<span class="n">n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+</span><span id="to_int-641"><a href="#to_int-641"><span class="linenos">641</span></a>
+</span><span id="to_int-642"><a href="#to_int-642"><span class="linenos">642</span></a>	<span class="k">try</span><span class="p">:</span>
+</span><span id="to_int-643"><a href="#to_int-643"><span class="linenos">643</span></a>		<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+</span><span id="to_int-644"><a href="#to_int-644"><span class="linenos">644</span></a>	<span class="k">except</span><span class="p">:</span>
+</span><span id="to_int-645"><a href="#to_int-645"><span class="linenos">645</span></a>		<span class="k">pass</span>
+</span><span id="to_int-646"><a href="#to_int-646"><span class="linenos">646</span></a>
+</span><span id="to_int-647"><a href="#to_int-647"><span class="linenos">647</span></a>	<span class="k">return</span> <span class="n">n</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Attempts to convert a given element to an integer. </p>
+
+<p>Args:
+        element: The element to convert.</p>
+
+<p>Returns:
+        The integer representation of the element if successful, otherwise NaN.</p>
+
+<p>Example:
+        to_int("123")  # 123
+        to_int("12.3") # NaN
+        to_int("abc")  # NaN
+        to_int(123)    # 123</p>
+</div>
+
+
+                </section>
+                <section id="format_float">
+                            <input id="format_float-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">format_float</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">arg</span>, </span><span class="param"><span class="n">decimals</span><span class="o">=</span><span class="mi">2</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="format_float-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#format_float"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="format_float-649"><a href="#format_float-649"><span class="linenos">649</span></a><span class="k">def</span> <span class="nf">format_float</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+</span><span id="format_float-650"><a href="#format_float-650"><span class="linenos">650</span></a><span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="format_float-651"><a href="#format_float-651"><span class="linenos">651</span></a><span class="sd">	Formats a float value to remove trailing zeros and the decimal point if unnecessary,</span>
+</span><span id="format_float-652"><a href="#format_float-652"><span class="linenos">652</span></a><span class="sd">	allowing for customization of the number of decimal places.</span>
+</span><span id="format_float-653"><a href="#format_float-653"><span class="linenos">653</span></a>
+</span><span id="format_float-654"><a href="#format_float-654"><span class="linenos">654</span></a><span class="sd">	Args:</span>
+</span><span id="format_float-655"><a href="#format_float-655"><span class="linenos">655</span></a><span class="sd">		arg: The float value to format.</span>
+</span><span id="format_float-656"><a href="#format_float-656"><span class="linenos">656</span></a><span class="sd">		decimals: The number of decimal places to display. Defaults to 2.</span>
+</span><span id="format_float-657"><a href="#format_float-657"><span class="linenos">657</span></a>
+</span><span id="format_float-658"><a href="#format_float-658"><span class="linenos">658</span></a><span class="sd">	Returns:</span>
+</span><span id="format_float-659"><a href="#format_float-659"><span class="linenos">659</span></a><span class="sd">		The formatted string representation of the float.</span>
+</span><span id="format_float-660"><a href="#format_float-660"><span class="linenos">660</span></a>
+</span><span id="format_float-661"><a href="#format_float-661"><span class="linenos">661</span></a><span class="sd">	Example:</span>
+</span><span id="format_float-662"><a href="#format_float-662"><span class="linenos">662</span></a><span class="sd">		format_float(12.3456) # &quot;12.35&quot;</span>
+</span><span id="format_float-663"><a href="#format_float-663"><span class="linenos">663</span></a><span class="sd">		format_float(12.0) # &quot;12&quot;</span>
+</span><span id="format_float-664"><a href="#format_float-664"><span class="linenos">664</span></a><span class="sd">		format_float(12.000) # &quot;12&quot;</span>
+</span><span id="format_float-665"><a href="#format_float-665"><span class="linenos">665</span></a><span class="sd">		format_float(12.3456, decimals=3) # &quot;12.346&quot;</span>
+</span><span id="format_float-666"><a href="#format_float-666"><span class="linenos">666</span></a><span class="sd">		format_float(12.3456, decimals=0) # &quot;12&quot;</span>
+</span><span id="format_float-667"><a href="#format_float-667"><span class="linenos">667</span></a><span class="sd">	&quot;&quot;&quot;</span>
+</span><span id="format_float-668"><a href="#format_float-668"><span class="linenos">668</span></a>	<span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimals</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Formats a float value to remove trailing zeros and the decimal point if unnecessary,
+allowing for customization of the number of decimal places.</p>
+
+<p>Args:
+        arg: The float value to format.
+        decimals: The number of decimal places to display. Defaults to 2.</p>
+
+<p>Returns:
+        The formatted string representation of the float.</p>
+
+<p>Example:
+        format_float(12.3456) # "12.35"
+        format_float(12.0) # "12"
+        format_float(12.000) # "12"
+        format_float(12.3456, decimals=3) # "12.346"
+        format_float(12.3456, decimals=0) # "12"</p>
 </div>
 
 
