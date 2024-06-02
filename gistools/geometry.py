@@ -141,7 +141,39 @@ POINT = [
 ]
 
 class Point:
+	"""
+	Represents a geographic point with latitude, longitude, and optional metadata.
+
+	Attributes:
+		id (str, optional): Unique identifier for the point.
+		external_id (str, optional): External identifier for the point.
+		name (str, optional): Name of the point.
+		description (str, optional): Description of the point.
+		longitude (float): Longitude coordinate of the point.
+		latitude (float): Latitude coordinate of the point.
+		plus_code (str, optional): Plus Code representation of the point.
+		geometry (dict, optional): GeoJSON representation of the point.
+		code_length (int): Length of the Plus Code to generate. Defaults to 10.
+
+	Example:
+		>>> point = Point({'latitude': 37.7749, 'longitude': -122.4194})
+		>>> point.id = '12345'
+		>>> point.name = 'Golden Gate Bridge'
+		>>> print(point.plus_code)
+		>>> print(point.to_WKT())
+		>>> print(point.to_json())
+	"""
 	def __init__(self, data=None, code_length=10):
+		"""
+		Initializes a Point object.
+
+		Args:
+			data (dict, optional): Dictionary containing point data. Defaults to None.
+			code_length (int, optional): Length of the Plus Code to generate. Defaults to 10.
+
+		Raises:
+			TypeError: If data is not a dictionary.
+		"""
 		self._data = none_dict(POINT)
 		self._code_length = code_length
 
@@ -163,18 +195,33 @@ class Point:
 	#--------------------------------------------------------------------------
 
 	def __repr__(self) -> str:
+		"""
+		Returns a string representation of the Point object.
+		"""
 		return '<{}>'.format(getattr(self, '__name__', self.__class__.__name__))
 
 	def __getitem__(self, key):
+		"""
+		Allows accessing attributes as dictionary keys.
+		"""
 		return getattr(self, key)
 
 	def __setitem__(self, key, value):
+		"""
+		Allows setting attributes as dictionary keys.
+		"""
 		setattr(self, key, value)
 
 	def __eq__(self, other):
+		"""
+		Checks if two Point objects are equal based on their data.
+		"""
 		return self.data == other.data
 
 	def __ne__(self, other):
+		"""
+		Checks if two Point objects are not equal based on their data.
+		"""
 		return self.data != other.data
 
 	#--------------------------------------------------------------------------
@@ -183,38 +230,65 @@ class Point:
 
 	@property
 	def data(self):
+		"""
+		Returns the data dictionary containing all attributes.
+		"""
 		return self._data
 
 	@data.setter
 	def data(self, value):
+		"""
+		Sets the data dictionary.
+		"""
 		self._data = value
 
 	@property
 	def id(self):
+		"""
+		Returns the ID of the point.
+		"""
 		return self._data.get('id', None)
 
 	@id.setter
 	def id(self, value):
+		"""
+		Sets the ID of the point.
+		"""
 		self._data['id'] = value
 
 	@property
 	def name(self):
+		"""
+		Returns the name of the point.
+		"""
 		return self.data.get('name', None)
 
 	@name.setter
 	def name(self, value):
+		"""
+		Sets the name of the point.
+		"""
 		self._data['name'] = value
 
 	@property
 	def latitude(self):
+		"""
+		Returns the latitude of the point.
+		"""
 		return self._data.get('latitude', None)
 	
 	@property
 	def longitude(self):
+		"""
+		Returns the longitude of the point.
+		"""
 		return self._data.get('longitude', None)
 
 	@property
 	def coordinates(self):
+		"""
+		Returns a tuple of latitude and longitude coordinates.
+		"""
 		return (self.latitude, self.longitude)	
 
 	@property

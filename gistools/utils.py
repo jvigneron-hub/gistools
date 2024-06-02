@@ -1,3 +1,98 @@
+"""
+Collection of utility functions for working with data in Python.
+
+This module provides a comprehensive set of functions for common data handling tasks in Python, including:
+	- Type checking for various data structures (lists, dictionaries, DataFrames, GeoDataFrames).
+	- Data manipulation functions (e.g., removing duplicates, adding values to lists, merging dictionaries, etc.).
+	- File handling functions (reading and writing CSV, JSON, and pickle files).
+	- Path manipulation functions (joining path components, creating directories).
+	- Date/Time functions for converting between different formats and extracting information from date/time objects.
+	- Numeric functions for checking numeric types, converting to integers, and formatting float values.
+	- System utility functions for checking method existence and retrieving class information.
+
+The module aims to be user-friendly and concise, offering convenient solutions for common data operations.
+The docstring provides a clear overview of the functions included in the module and their usage.
+
+# System utilities
+- `has_method(obj, method)`: Checks if an object has a specific method.
+- `get_class_name(obj)`: Retrieves the class name of the given object.
+- `get_class_attr(classname)`: Retrieves public attributes of a given class.
+
+# Date/Time
+- `isoformat_as_datetime(s, format_string)`: Converts an ISO 8601 formatted string to a datetime object.
+- `str2datetime(s, format_string)`: Converts a string representing a date and time to a datetime object.
+- `datetime2str(d, format_string)`: Converts a datetime object to a string representation.
+- `str2localdatetime(s, format_string, timezone)`: Converts a string representing a UTC datetime to a local datetime object.
+- `str2timestamp(s, format_string)`: Converts a string representing a date and time to a Unix timestamp (integer seconds since epoch).
+- `utc_to_local(utc_dt)`: Converts a UTC datetime object to a local datetime object.
+- `str2localtimestamp(s, format_string)`: Converts a UTC datetime string to a local timestamp (integer seconds since epoch).
+- `str2localdatetime(s, format_string, timezone)`: Converts a UTC datetime string to a local datetime object.
+- `timestamp2str(t, format_string)`: Converts a Unix timestamp (integer seconds since epoch) to a string representation.
+- `timestr2seconds(timestr)`: Converts a time string in HH:MM:SS format to seconds.
+- `timestr2minutes(timestr)`: Converts a time string in MM:SS format to minutes.
+- `seconds2timestr(duration, format_string)`: Converts a duration in seconds to a time string in the specified format.
+- `to_timestr(seconds)`: Converts a duration in seconds to a time string in HH:MM:SS format.
+- `total_seconds(start, end, format_string)`: Calculates the total number of seconds between two datetime strings.
+- `format_datetime(s, format_from, format_to)`: Converts a datetime string from one format to another.
+- `is_date(d, format_string)`: Checks if a string represents a valid date in the specified format.
+- `is_time(t, format_string)`: Checks if a string represents a valid time in the specified format.
+- `isocalendar(s, format_string)`: Returns the ISO calendar tuple (ISO year, ISO week number, ISO weekday) for a given date string.
+- `weekday(s, format_string)`: Returns the weekday (1-7) for a given date string, where 1 is Monday and 7 is Sunday.
+- `weekday_name(s, format_string)`: Returns the full name of the weekday for a given date string.
+
+# Numeric
+- `isnan(number)`: Checks if a number is NaN (Not a Number). 
+- `is_numeric(literal)`: Checks if a given string represents a numeric value.
+- `is_integer(number)`: Checks if a number is an integer.
+- `is_numeric_and_integer(arg)`: Checks if a given argument is both numeric and an integer.
+- `is_float(number)`: Checks if a number is a float (floating-point number).
+- `is_number_regex(s)`: Checks if a string represents a numeric value using regular expressions.
+- `is_number_repl_isdigit(s)`: Checks if a string represents a numeric value using string manipulation.
+- `to_int(element)`: Attempts to convert a given element to an integer. 
+- `format_float(arg, decimals)`: Formats a float value to remove trailing zeros and the decimal point if unnecessary.
+
+# Lists
+- `is_list(arg)`: Checks if an object is a list-like structure.
+- `is_array(a)`: Checks if an object is array-like (has a length attribute).
+- `is_in_collection(element, collection)`: Checks if an element is present in a collection.
+- `remove_none(l)`: Removes None values from a list.
+- `intersection(list1_, list2_)`: Calculates the intersection of two lists.
+- `itemgetter(l, key)`: Gets a specific item from each element in a list of dictionaries.
+- `is_in_list(l, pattern)`: Checks if all elements in a list are present in another list or pattern.
+- `is_in_list_of_dict(l, key, value)`: Checks if a specific value exists for a given key in any dictionary within a list of dictionaries.
+- `drop_duplicates(l)`: Removes duplicate elements from a list while preserving order.
+- `subfinder(l, pattern)`: Finds elements in a list that are present in another list or pattern.
+- `split_listoftuples(l)`: Splits a list of tuples into separate lists based on their elements.
+- `find_duplicates(l)`: Finds duplicate elements in a list.
+- `add_to(l, value)`: Adds a value to each element in a list.
+
+# Dictionnaries
+- `merge_dicts(dict1, dict2)`: Merges two dictionaries, giving preference to values from dict2 in case of key conflicts.
+- `none_dict(from_list)`: Creates a dictionary with None values for each key in a given list.
+- `is_empty(d, usecols)`: Checks if a dictionary is empty, optionally considering only specific keys.
+- `is_set(record, key)`: Checks if a key exists in a dictionary.
+- `is_set_toint(record, key)`: Checks if a key exists in a dictionary and its value is an integer.
+- `is_set_tofloat(record, key)`: Checks if a key exists in a dictionary and its value is a float.
+- `is_set_tostr(record, key)`: Checks if a key exists in a dictionary and its value is a string.
+
+# I/O
+- `ospath extension(filename)`: Gets the file extension from a filename.
+- `ospath filename(filename)`: Gets the filename (without the extension) from a filepath.
+- `ospath join(pathname, filename)`: Joins a pathname and filename, handling potential None values.
+- `make_directory(path, folder)`: Creates a directory if it doesn't exist, optionally within a parent directory.
+- `is_tsp_file(filename)`: Checks if a filename represents a TSP file.
+- `is_vrp_file(filename)`: Checks if a filename represents a VRP file.
+- `is_csv_file(filename)`: Checks if a filename represents a CSV file.
+- `is_json(filename)`: Checks if a filename represents a JSON file.
+- `read_dataframe(filename, pathname, columns, encoding, delimiter, decode, index)`: Reads a CSV file into a Pandas DataFrame.
+- `to_dataframe(dataframe, filename, pathname, encoding, delimiter, with_index, usecols)`: Saves a Pandas DataFrame to a CSV file.
+- `read_pickle(filename, pathname, from_)`: Reads a pickled object from a file, handling DataFrames and general objects.
+- `to_pickle(obj, filename, pathname)`: Saves an object to a pickle file, handling DataFrames and general objects.
+- `read_json(filename, pathname)`: Reads a JSON file into a dictionary.
+- `to_json(json_dict, filename, pathname, indent)`: Saves a dictionary to a JSON file.
+- `read_csv(filename, pathname, delimiter)`: Reads a CSV file into a list of dictionaries.
+- `to_csv(data, filename, pathname, encoding, delimiter, with_index, usecols)`: Saves data to a CSV file, handling lists of dictionaries, DataFrames, and GeoDataFrames. 
+"""
 import math
 import time
 import inspect
