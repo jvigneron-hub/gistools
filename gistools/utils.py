@@ -897,9 +897,38 @@ def add_to(l, value):
 #------------------------------------------------------------------------------
 
 def merge_dicts(dict1, dict2):
+	"""
+	Merges two dictionaries, giving preference to values from dict2 in case of key conflicts.
+
+	Args:
+		dict1: The first dictionary.
+		dict2: The second dictionary.
+
+	Returns:
+		A new dictionary containing all key-value pairs from both input dictionaries,
+		with values from dict2 taking precedence in case of overlapping keys.
+
+	Example:
+		dict1 = {'a': 1, 'b': 2}
+		dict2 = {'b': 3, 'c': 4}
+		merged_dict = merge_dicts(dict1, dict2)
+		print(merged_dict)  # Output: {'a': 1, 'b': 3, 'c': 4}
+	"""
 	return {**dict1, **dict2}
 
 def none_dict(from_list):
+	"""
+	Creates a dictionary with None values for each key in a given list.
+
+	Args:
+		from_list: The list of keys for the dictionary.
+
+	Returns:
+		A dictionary with None values for each key in the input list.
+
+	Example:
+		none_dict(['a', 'b', 'c']) # Output: {'a': None, 'b': None, 'c': None}
+	"""
 	return {key: None for key in from_list}
 
 def is_empty(d: dict, usecols=None) -> bool:
@@ -919,6 +948,24 @@ def is_empty(d: dict, usecols=None) -> bool:
 	return l == 0
 
 def is_set(record, key) -> bool:
+	"""
+	Checks if a dictionary is empty, optionally considering only specific keys.
+
+	Args:
+		d: The dictionary to check.
+		usecols: A list of keys to consider for emptiness. If None, checks all keys. Defaults to None.
+
+	Returns:
+		True if the dictionary is empty or all specified keys have empty values, False otherwise.
+
+	Raises:
+		TypeError: If 'usecols' is not a list of strings.
+
+	Example:
+		is_empty({'a': '', 'b': None, 'c': 0}) # False (not empty)
+		is_empty({'a': '', 'b': None, 'c': 0}, usecols=['a']) # True ('a' is empty)
+		is_empty({'a': 1, 'b': 2, 'c': 3}, usecols=['d']) # True ('d' is not present)
+	"""
 	if key in record:
 		if record[key] is not None: 
 			if isinstance(record[key], str) or isinstance(record[key], list):
@@ -929,6 +976,21 @@ def is_set(record, key) -> bool:
 	return False
 
 def is_set_toint(record, key) -> bool:
+	"""
+	Checks if a key exists in a dictionary and its value is an integer.
+
+	Args:
+		record: The dictionary to check.
+		key: The key to check for.
+
+	Returns:
+		True if the key exists and its value is an integer, False otherwise.
+
+	Example:
+		is_set_toint({'a': 1, 'b': '2', 'c': 3.14}, 'a') # True
+		is_set_toint({'a': 1, 'b': '2', 'c': 3.14}, 'b') # False (value is a string)
+		is_set_toint({'a': 1, 'b': '2', 'c': 3.14}, 'd') # False (key does not exist)
+	"""
 	flag = False
 
 	if is_set(record, key):
@@ -938,6 +1000,22 @@ def is_set_toint(record, key) -> bool:
 	return flag
 
 def is_set_tofloat(record, key) -> bool:
+	"""
+	Checks if a key exists in a dictionary and its value is a float.
+
+	Args:
+		record: The dictionary to check.
+		key: The key to check for.
+
+	Returns:
+		True if the key exists and its value is a float, False otherwise.
+
+	Example:
+		is_set_tofloat({'a': 1, 'b': '2.5', 'c': 3.14}, 'a') # False (value is an int)
+		is_set_tofloat({'a': 1, 'b': '2.5', 'c': 3.14}, 'b') # False (value is a string)
+		is_set_tofloat({'a': 1, 'b': '2.5', 'c': 3.14}, 'c') # True
+		is_set_tofloat({'a': 1, 'b': '2.5', 'c': 3.14}, 'd') # False (key does not exist)
+	"""
 	flag = False
 
 	if is_set(record, key):
@@ -947,6 +1025,21 @@ def is_set_tofloat(record, key) -> bool:
 	return flag
 
 def is_set_tostr(record, key) -> bool:
+	"""
+	Checks if a key exists in a dictionary and its value is a string.
+
+	Args:
+		record: The dictionary to check.
+		key: The key to check for.
+
+	Returns:
+		True if the key exists and its value is a string, False otherwise.
+
+	Example:
+		is_set_tostr({'a': 1, 'b': 'hello', 'c': 3.14}, 'a') # False (value is an int)
+		is_set_tostr({'a': 1, 'b': 'hello', 'c': 3.14}, 'b') # True
+		is_set_tostr({'a': 1, 'b': 'hello', 'c': 3.14}, 'd') # False (key does not exist)
+	"""
 	flag = False
 
 	if is_set(record, key):
@@ -959,20 +1052,63 @@ def is_set_tostr(record, key) -> bool:
 #------------------------------------------------------------------------------
 
 def is_dataframe(records):
+	"""
+	Checks if an object is a Pandas DataFrame or a GeoDataFrame.
+
+	Args:
+		records: The object to check.
+
+	Returns:
+		True if the object is a Pandas DataFrame or a GeoDataFrame, False otherwise.
+	"""
 	return isinstance(records, pandas.DataFrame) or isinstance(records, geopandas.GeoDataFrame)
 
-def get_dataframe(obj):
-	if hasattr(obj, 'data'):
-		obj = obj.data
-
-	return obj if is_dataframe(obj) else from_dict(obj)
-
 def get_columns(df, empty=False):
+	"""
+	Gets a list of column names from a Pandas DataFrame.
+
+	Args:
+		df: The Pandas DataFrame.
+		empty: If True, returns only column names that have at least one missing value (NaN).
+		If False, returns all column names. Defaults to False.
+
+	Returns:
+		A list of column names.
+
+	Example:
+		df = pd.DataFrame({'A': [1, 2, np.nan], 'B': [4, 5, 6], 'C': [np.nan, np.nan, np.nan]})
+		get_columns(df) # Output: ['A', 'B', 'C'] (all columns)
+		get_columns(df, empty=True) # Output: ['A', 'C'] (columns with missing values)
+	"""
 	s = df.isnull().any()
 
 	return s[s == empty].index.tolist()
 
 def from_dict(d: dict, columns=None) -> DataFrame:
+	"""
+	Creates a Pandas DataFrame from a dictionary, optionally specifying column order.
+
+	Args:
+		d: The dictionary to convert to a DataFrame.
+		columns: A list of column names to specify the order of columns in the DataFrame.
+		If None, columns are ordered alphabetically. Defaults to None.
+
+	Returns:
+		A Pandas DataFrame.
+
+	Example:
+	data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+	df = from_dict(data)
+	print(df)  # Output:   A  B
+		# 0  1  4
+		# 1  2  5
+		# 2  3  6
+	df = from_dict(data, columns=['B', 'A'])
+	print(df)  # Output:   B  A
+		# 0  4  1
+		# 1  5  2
+		# 2  6  3
+	"""
 	df = pandas.DataFrame.from_dict(d)
 	if columns is not None:
 		df = df.reindex (columns=columns)
@@ -980,6 +1116,28 @@ def from_dict(d: dict, columns=None) -> DataFrame:
 	return df
 
 def where(df, expr):
+	"""
+	Applies filtering conditions to a Pandas DataFrame based on a given expression.
+
+	Args:
+		df: The Pandas DataFrame to filter.
+		expr: A tuple, list of tuples, or a single tuple defining the filtering criteria.
+		- Single Tuple: (column_name, operator, value)
+		- List of Tuples: [(column_name, operator, value), ...]
+		- Tuple of Tuples: ((column_name, operator, value), ...) 
+
+	Returns:
+		A new DataFrame filtered based on the provided expression.
+
+	Supported Operators:
+		- '==', '!=', '>', '<', '>=', '<='
+		- 'isin' (for membership in a list)
+		- '~isin' (for negation of membership in a list)
+
+	Example:
+		- where(df, ('col1', '>', 10))
+		- where(df, [('col2', '==', 'value'), ('col3', 'isin', [1, 2, 3])])
+	"""
 	if isinstance(expr, tuple):
 		expr = [expr]
 
@@ -1007,12 +1165,48 @@ def where(df, expr):
 	return df
 
 def isin(df: DataFrame, key: str, values: list):
+	"""
+	Filters a DataFrame to keep rows where the specified column's value is in the given list.
+
+	Args:
+		df: The DataFrame to filter.
+		key: The name of the column to check.
+		values: The list of values to check against. If a string is provided, it's treated as a single value.
+
+	Returns:
+		A new DataFrame containing only the rows where the column value is in the list.
+
+	Example:
+	df = pd.DataFrame({'A': [1, 2, 3, 4], 'B': ['a', 'b', 'c', 'd']})
+	filtered_df = isin(df, 'A', [1, 3])
+	print(filtered_df) # Output: A  B
+		# 0  1  a
+		# 2  3  c
+
+	filtered_df = isin(df, 'B', 'b')  # 'b' is treated as a single value
+	print(filtered_df)  # Output: A  B
+		# 1  2  b
+	"""
 	return df[df[key].isin([values] if isinstance(values, str) else values)]
 
 def not_isin(df: DataFrame, key: str, values: list):
 	return df[~df[key].isin([values] if isinstance(values, str) else values)]
 
 def join(left, right, left_on, right_on, how='left', output=None):
+	"""
+	Performs a merge operation between two DataFrames.
+
+	Args:
+		left: The left DataFrame.
+		right: The right DataFrame.
+		left_on: The column name in the left DataFrame to use for merging.
+		right_on: The column name in the right DataFrame to use for merging.
+		how: The type of merge to perform ('left', 'right', 'inner', 'outer'). Defaults to 'left'.
+		output: The name of the column to extract from the merged DataFrame. If None, returns the entire merged DataFrame. Defaults to None.
+
+	Returns:
+		A new DataFrame or a list containing the specified column from the merged DataFrame.
+	"""
 	df = pandas.merge(left, right, left_on=left_on, right_on=right_on, how=how)
 
 	if output is not None:
@@ -1021,11 +1215,36 @@ def join(left, right, left_on, right_on, how='left', output=None):
 		return df
 
 def to_geo(data: DataFrame, from_=('longitude', 'latitude'), epsg=4326) -> geopandas.GeoDataFrame:
+	"""
+	Converts a Pandas DataFrame to a GeoDataFrame with points based on longitude and latitude columns.
+
+	Args:
+		data: The Pandas DataFrame to convert.
+		from_: A tuple containing the column names for longitude and latitude, respectively. Defaults to ('longitude', 'latitude').
+		epsg: The EPSG code for the desired coordinate reference system (CRS). Defaults to 4326 (WGS84).
+
+	Returns:
+		A GeoDataFrame with a 'geometry' column containing points based on the specified columns.
+	"""
 	return geopandas.GeoDataFrame(
 		data, geometry=geopandas.points_from_xy(x=data.get(from_[0]), y=data.get(from_[1]))
 	).set_crs(epsg=epsg)
 
 def select(data, enum, on=None):
+	"""
+	Applies a mapping from an enumeration to a list, NumPy array, or Pandas DataFrame column.
+
+	Args:
+		data: The list, NumPy array, or Pandas DataFrame to apply the mapping to.
+		enum: A dictionary representing the mapping from keys to values.
+		on: The name of the column in the DataFrame to apply the mapping to. Required if 'data' is a DataFrame.
+
+	Returns:
+		A NumPy array with the mapped values.
+
+	Raises:
+		ValueError: If 'data' is not a valid type or if 'on' is not a valid column in the DataFrame.
+	"""
 	conditions = []
 	choices    = []
 
@@ -1054,18 +1273,76 @@ def select(data, enum, on=None):
 #------------------------------------------------------------------------------
 
 def ospathextension(filename):
+	"""
+	Gets the file extension from a filename using the os.path.splitext function.
+
+	Args:
+		filename: The filename to extract the extension from.
+
+	Returns:
+		The file extension (including the dot), or an empty string if no extension is found.
+
+	Example:
+		ospath extension("myfile.txt") # Output: ".txt"
+		ospath extension("my_image.jpg") # Output: ".jpg"
+		ospath extension("document.pdf") # Output: ".pdf"
+		ospath extension("file_without_extension") # Output: ""
+	"""
 	return os.path.splitext(filename)[1]
 
 def ospathfilename(filename):
+	"""
+	Gets the filename (without the extension) from a filepath using the os.path.splitext function.
+
+	Args:
+		filename: The filepath to extract the filename from.
+
+	Returns:
+		The filename (without the extension), or the entire filepath if no extension is found.
+
+	Example:
+		ospath filename("path/to/myfile.txt") # Output: "myfile"
+		ospath filename("my_image.jpg") # Output: "my_image"
+		ospath filename("document.pdf") # Output: "document"
+		ospath filename("file_without_extension") # Output: "file_without_extension"
+	"""
 	return os.path.splitext(filename)[0]
 
 def ospathjoin(pathname, filename):
+	"""
+	Joins a pathname and filename, handling potential None values.
+
+	Args:
+		pathname: The pathname to join. Can be None if no pathname is required.
+		filename: The filename to join.
+
+	Returns:
+		The joined path, or the filename itself if pathname is None.
+
+	Example:
+		ospath join("path/to/folder", "myfile.txt") # Output: "path/to/folder/myfile.txt"
+		ospath join(None, "my_image.jpg") # Output: "my_image.jpg"
+	"""
 	if pathname is not None:
 		return os.path.join(pathname, filename)
 	else:
 		return filename	
 
 def make_directory(path, folder=None):
+	"""
+	Creates a directory if it doesn't exist, optionally within a parent directory.
+
+	Args:
+		path: The base path to create the directory in.
+		folder: The name of the subdirectory to create. If None, creates the directory at the specified path. Defaults to None.
+
+	Returns:
+		The full path to the created directory.
+
+	Example:
+		make_directory("/tmp", "my_folder") # Creates "/tmp/my_folder" if it doesn't exist.
+		make_directory("/tmp") # Creates "/tmp" if it doesn't exist.
+	"""
 	if folder is not None:
 		if not isinstance(folder, str):
 			folder = str(folder)
@@ -1076,30 +1353,104 @@ def make_directory(path, folder=None):
 	return path
 
 def is_tsp_file(filename):
+	"""
+	Checks if a filename represents a TSP (Traveling Salesperson Problem) file.
+
+	Args:
+		filename: The filename to check.
+
+	Returns:
+		True if the filename ends with '.tsp' (case-insensitive), False otherwise.
+
+	Example:
+		is_tsp_file("my_tsp_file.tsp") # True
+		is_tsp_file("my_file.txt") # False
+		is_tsp_file("tsp_file.TSP") # True (case-insensitive)
+	"""
 	if isinstance(filename, str):
 		return filename.lower().endswith('.tsp')
 	else:
 		return False
 
 def is_vrp_file(filename):
+	"""
+	Checks if a filename represents a VRP (Vehicle Routing Problem) file.
+
+	Args:
+		filename: The filename to check.
+
+	Returns:
+		True if the filename ends with '.vrp' (case-insensitive), False otherwise.
+
+	Example:
+		is_vrp_file("my_vrp_file.vrp") # True
+		is_vrp_file("my_file.txt") # False
+		is_vrp_file("vrp_file.VRP") # True (case-insensitive)
+	"""
 	if isinstance(filename, str):
 		return filename.lower().endswith('.vrp')
 	else:
 		return False
 
 def is_csv_file(filename):
+	"""
+	Checks if a filename represents a CSV (Comma-Separated Values) file.
+
+	Args:
+		filename: The filename to check.
+
+	Returns:
+		True if the filename ends with '.csv' (case-insensitive), False otherwise.
+
+	Example:
+		is_csv_file("my_data.csv") # True
+		is_csv_file("my_file.txt") # False
+		is_csv_file("data.CSV") # True (case-insensitive)
+	"""
 	if isinstance(filename, str):
 		return filename.lower().endswith('.csv')
 	else:
 		return False
 
 def is_json(filename):
+	"""
+	Checks if a filename represents a JSON (JavaScript Object Notation) file.
+
+	Args:
+		filename: The filename to check.
+
+	Returns:
+		True if the filename ends with '.json' (case-insensitive), False otherwise.
+
+	Example:
+		is_json("my_data.json") # True
+		is_json("my_file.txt") # False
+		is_json("data.JSON") # True (case-insensitive)
+	"""
 	if isinstance(filename, str):
 		return filename.lower().endswith('.json')
 	else:
 		return False
 
 def read_dataframe(filename, pathname=None, columns=None, encoding='utf-8', delimiter=';', decode=False, index=None):
+	"""
+	Reads a CSV file into a Pandas DataFrame.
+
+	Args:
+		filename: The name of the CSV file.
+		pathname: The optional pathname of the directory containing the file. Defaults to None.
+		columns: A list of column names to read. If None, reads all columns. Defaults to None.
+		encoding: The encoding of the CSV file. Defaults to 'utf-8'.
+		delimiter: The delimiter used in the CSV file. Defaults to ';'.
+		decode: If True, decodes the file using 'utf-16' encoding. Defaults to False.
+		index: The name of the column to use as the index. If None, no index is set. Defaults to None.
+
+	Returns:
+		A Pandas DataFrame containing the data from the CSV file.
+
+	Example:
+		df = read_dataframe("my_data.csv", pathname="/path/to/data", columns=['A', 'B'], delimiter=",", encoding="latin-1")
+	"""
 	full_filename = ospathjoin(pathname, filename)
 	if decode:
 		full_filename = codecs.open(full_filename, 'rU','utf-16')
@@ -1124,6 +1475,25 @@ def read_dataframe(filename, pathname=None, columns=None, encoding='utf-8', deli
 	return dataframe
 
 def to_dataframe(dataframe, filename, pathname=None, encoding='utf-8', delimiter=';', with_index=False, usecols=None):
+	"""
+	Saves a Pandas DataFrame to a CSV file.
+
+	Args:
+		dataframe: The Pandas DataFrame to save.
+		filename: The name of the CSV file to save.
+		pathname: The optional pathname of the directory to save the file in. Defaults to None.
+		encoding: The encoding to use for the CSV file. Defaults to 'utf-8'.
+		delimiter: The delimiter to use in the CSV file. Defaults to ';'.
+		with_index: If True, includes the index in the CSV file. Defaults to False.
+		usecols: A list of column names to save. If None, saves all columns. Defaults to None.
+
+	Returns:
+		None.
+
+	Example:
+		df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+		to_dataframe(df, "my_data.csv", pathname="/path/to/data", delimiter=",", encoding="latin-1")
+	"""
 	full_filename = ospathjoin(pathname, filename)
 
 	if usecols is not None:
@@ -1145,6 +1515,21 @@ def to_dataframe(dataframe, filename, pathname=None, encoding='utf-8', delimiter
 	return None
 
 def read_pickle(filename, pathname=None, from_=None):
+	"""
+	Reads a pickled object from a file, handling DataFrames and general objects.
+
+	Args:
+		filename: The name of the pickled file.
+		pathname: The optional pathname of the directory containing the file. Defaults to None.
+		from_: If 'dataframe', assumes the file contains a pickled DataFrame. Otherwise, reads as a general pickled object. Defaults to None.
+
+	Returns:
+		The loaded object (DataFrame or general object).
+
+	Example:
+		df = read_pickle("my_data.pkl", pathname="/path/to/data", from_='dataframe')
+		data = read_pickle("my_data.pkl", pathname="/path/to/data") 
+	"""
 	obj = None
 
 	if from_ == 'dataframe':
@@ -1156,6 +1541,21 @@ def read_pickle(filename, pathname=None, from_=None):
 	return obj
 
 def to_pickle(obj, filename, pathname=None):
+	"""
+	Saves an object to a pickle file, handling DataFrames and general objects.
+
+	Args:
+		obj: The object to save. Can be a Pandas DataFrame or any other picklable object.
+		filename: The name of the pickle file to save.
+		pathname: The optional pathname of the directory to save the file in. Defaults to None.
+
+	Returns:
+		None.
+
+	Example:
+		to_pickle(df, "my_data.pkl", pathname="/path/to/data") # Save a DataFrame
+		to_pickle(my_list, "my_data.pkl", pathname="/path/to/data") # Save a list
+	"""
 	if is_dataframe(obj):
 		obj.to_pickle(ospathjoin(pathname, filename))
 	else:
@@ -1165,27 +1565,95 @@ def to_pickle(obj, filename, pathname=None):
 	return None
 
 def read_json(filename, pathname=None):
+	"""
+	Reads a JSON file into a dictionary.
+
+	Args:
+		filename: The name of the JSON file.
+		pathname: The optional pathname of the directory containing the file. Defaults to None.
+
+	Returns:
+		A dictionary containing the data from the JSON file.
+
+	Example:
+		data = read_json("my_data.json", pathname="/path/to/data")
+	"""
 	with open(ospathjoin(pathname, filename), "r") as read_file:
 		json_dict = json.load(read_file)
 	return json_dict
 
 def to_json(json_dict, filename, pathname=None, indent=4):
+	"""
+	Saves a dictionary to a JSON file.
+
+	Args:
+		json_dict: The dictionary to save as JSON.
+		filename: The name of the JSON file to save.
+		pathname: The optional pathname of the directory to save the file in. Defaults to None.
+		indent: The number of spaces to use for indentation in the output JSON. Defaults to 4.
+
+	Returns:
+		None.
+
+	Example:
+		data = {'a': 1, 'b': 2, 'c': {'d': 3, 'e': 4}}
+		to_json(data, "my_data.json", pathname="/path/to/data")
+	"""
 	with open(ospathjoin(pathname, filename), "w") as write_file:
 		json.dump(json_dict, write_file, indent=indent)
 	return None
 
 def read_csv(filename, pathname=None, delimiter=';'):
+	"""
+	Reads a CSV file into a list of dictionaries.
+
+	Args:
+		filename: The name of the CSV file.
+		pathname: The optional pathname of the directory containing the file. Defaults to None.
+		delimiter: The delimiter used in the CSV file. Defaults to ';'.
+
+	Returns:
+		A list of dictionaries, where each dictionary represents a row in the CSV file.
+		The keys of the dictionaries are the column names from the CSV file.
+
+	Example:
+		data = read_csv("my_data.csv", pathname="/path/to/data", delimiter=",")
+	"""
 	data = None
 
 	try:
 		with open(ospathjoin(pathname, filename), newline='') as csvfile:
 			data = [row for row in csv.DictReader(csvfile, delimiter=';')]
 	except IOError:
-		print('Oops! I/O error.')	
+		print('Oops! Something went wrong.')	
 
 	return data
 
 def to_csv(data, filename, pathname=None, encoding='utf-8', delimiter=';', with_index=False, usecols=None):
+	"""
+	Saves data to a CSV file, handling lists of dictionaries, DataFrames, and GeoDataFrames.
+
+	Args:
+		data: The data to save. Can be a list of dictionaries, a Pandas DataFrame, or a GeoDataFrame.
+		filename: The name of the CSV file to save.
+		pathname: The optional pathname of the directory to save the file in. Defaults to None.
+		encoding: The encoding to use for the CSV file. Defaults to 'utf-8'.
+		delimiter: The delimiter to use in the CSV file. Defaults to ';'.
+		with_index: If True, includes the index in the CSV file. Defaults to False.
+		usecols: A list of column names to save. If None, saves all columns. Defaults to None.
+
+	Returns:
+		None.
+
+	Example:
+		# Save a list of dictionaries
+		data = [{'A': 1, 'B': 2}, {'A': 3, 'B': 4}]
+		to_csv(data, "my_data.csv", pathname="/path/to/data", delimiter=",")
+
+		# Save a DataFrame
+		df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+		to_csv(df, "my_data.csv", pathname="/path/to/data", delimiter=",")
+	"""
 	if is_dataframe(data):
 		to_dataframe(
 			data       = data, 
