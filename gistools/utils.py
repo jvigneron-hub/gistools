@@ -2,13 +2,13 @@
 Collection of utility functions for working with data in Python.
 
 This module provides a comprehensive set of functions for common data handling tasks in Python, including:
-	- Type checking for various data structures (lists, dictionaries, DataFrames, GeoDataFrames).
-	- Data manipulation functions (e.g., removing duplicates, adding values to lists, merging dictionaries, etc.).
-	- File handling functions (reading and writing CSV, JSON, and pickle files).
-	- Path manipulation functions (joining path components, creating directories).
-	- Date/Time functions for converting between different formats and extracting information from date/time objects.
-	- Numeric functions for checking numeric types, converting to integers, and formatting float values.
-	- System utility functions for checking method existence and retrieving class information.
+- `Type checking for various data structures (lists, dictionaries, DataFrames, GeoDataFrames).
+- `Data manipulation functions (e.g., removing duplicates, adding values to lists, merging dictionaries, etc.).
+- `File handling functions (reading and writing CSV, JSON, and pickle files).
+- `Path manipulation functions (joining path components, creating directories).
+- `Date/Time functions for converting between different formats and extracting information from date/time objects.
+- `Numeric functions for checking numeric types, converting to integers, and formatting float values.
+- `System utility functions for checking method existence and retrieving class information.
 
 The module aims to be user-friendly and concise, offering convenient solutions for common data operations.
 The docstring provides a clear overview of the functions included in the module and their usage.
