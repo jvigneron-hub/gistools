@@ -1,2 +1,2 @@
 # gistools
- Gistools
+A Python package for working with geospatial data.
