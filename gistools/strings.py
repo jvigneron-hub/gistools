@@ -1,3 +1,33 @@
+"""
+This module provides a collection of functions for string manipulation, text cleaning, and similarity calculation.
+
+**String Manipulation:**
+* `is_string`: Checks if a value is a string.
+* `is_list_of_strings`: Checks if a list contains only strings.
+* `is_empty`: Checks if a string or list is empty.
+* `to_ascii`: Converts a string to ASCII.
+* `remove_redundant_whitespaces`: Removes redundant whitespaces from a string.
+* `replace_character`: Replaces special characters in a string.
+* `normalize`: Normalizes a string by removing keywords, replacing characters, and removing redundant whitespaces.
+* `clean`: Cleans a string by removing special characters, extra whitespaces, and converting to lowercase.
+
+**String Similarity:**
+* `longest_common_substring`: Finds the longest common substring between two strings.
+* `longest_common_subsequence`: Finds the longest common subsequence between two strings.
+* `most_frequent`: Finds the most frequent element in a list.
+* `longest_match`: Finds the longest common substring among a list of strings.
+* `levenshtein_distance`: Calculates the Levenshtein distance and ratio between two strings.
+* `remove_character`: Removes a specific character from a string.
+* `remove_keywords`: Removes keywords from a string.
+* `match`: Checks if two strings match using a specified metric.
+* `distance`: Calculates the distance between two strings using a specified metric.
+* `similarity`: Calculates the similarity between two strings using Levenshtein distance.
+
+**Other Functions:**
+* `str2list`: Converts a string to a list of strings.
+* `build_sequence`: Builds a sequence string from a record using specified keys.
+* `drop_duplicates`: Drops duplicate values from a record.
+"""
 import re
 import inspect
 import unicodedata 
@@ -8,17 +38,38 @@ from collections import OrderedDict
 from difflib     import SequenceMatcher
 
 def is_string(val) -> bool:
-	""" Determines whether the passed value is a string. 
+	"""
+	Checks if the input value is a string.
+
+	Args:
+	- **val**: The value to check.
+
+	Returns:
+	- **boolean**: True if the input value is a string, False otherwise.
 	"""
 	return isinstance(val, str)
 
 def is_list_of_strings(l) -> bool:
-	"""Check if an object is a list of strings.
 	"""
+	Checks if the input list contains only strings.
+
+	Args:
+	- **l**: The list to check.
+
+	Returns:
+	- **boolean**: True if the input list contains only strings, False otherwise.
+	"""	
 	return all(isinstance(s, str) for s in l)
 
 def is_empty(s) -> bool:
-	"""Check if string is empty.
+	"""
+	Checks if the input string or list is empty.
+
+	Args:
+	- **s**: The string or list to check.
+
+	Returns:
+	- **boolean**: True if the input string or list is empty, False otherwise.
 	"""
 	flag = True
 
@@ -29,7 +80,14 @@ def is_empty(s) -> bool:
 	return flag
 
 def to_ascii(s) -> str:
-	"""remove non ascii characters in a given string.
+	"""
+	Converts a string to ASCII.
+
+	Args:
+	- **s**: The string to convert.
+
+	Returns:
+	- **str**: The ASCII representation of the string.
 	"""
 	if not isinstance(s, str):
 		s = str(s)
@@ -37,12 +95,26 @@ def to_ascii(s) -> str:
 	return ''.join([c for c in s if c.isascii()])
 
 def remove_redundant_whitespaces(s: str) -> str:
-	""" Substitute all tabs, newlines and other "whitespace-like" characters then remove any leading and trailing whitespaces.
+	"""
+	Removes redundant whitespaces from a string.
+
+	Args:
+	- **s**: The string to clean.
+
+	Returns:
+	- **str**: The cleaned string.
 	"""
 	return re.sub('\s+', ' ', s).strip()
 
 def replace_character(s: str) -> str:
-	""" Remove accents and other undesirable characters (to be used with string distance functions).
+	"""
+	Replaces special characters in a string.
+
+	Args:
+	- **s**: The string to replace characters in.
+
+	Returns:
+	- **str**: The string with replaced characters.
 	"""
 	character_in  = ['é', 'è', 'ê', 'à', 'ù', 'û', 'ç', 'ô', 'î', 'ï', 'â', '-', '*', '.', '_', '{', '}', '!']
 	character_out = ['e', 'e', 'e', 'a', 'u', 'u', 'c', 'o', 'i', 'i', 'a', ' ', ' ', ' ', ' ', '' , '' , '' ]
@@ -54,11 +126,26 @@ def replace_character(s: str) -> str:
 	return s_out
 
 def normalize(string: str) -> str:
+	"""
+	Normalizes a string by removing keywords, replacing characters, and removing redundant whitespaces.
+
+	Args:
+	- **string**: The string to normalize.
+
+	Returns:
+	- **str**: The normalized string.
+	"""
 	return remove_redundant_whitespaces(remove_keywords(replace_character(string.lower())))
 
 def clean(string: str) -> str:
-	"""Do a little bit of data cleaning with the help of Unidecode and Regex.
-	Things like casing, extra spaces, quotes and new lines can be ignored.
+	"""
+	Cleans a string by removing special characters, extra whitespaces, and converting to lowercase.
+
+	Args:
+	- **string**: The string to clean.
+
+	Returns:
+	- **str**: The cleaned string, or None if the string is empty or missing.
 	"""
 	cleaned = unidecode(string)
 	cleaned = re.sub('  +', ' ', cleaned)
@@ -71,8 +158,6 @@ def clean(string: str) -> str:
 	return cleaned
 
 def longest_common_substring(s1: str, s2: str) -> str:
-	""" Extract the longest substring from 2 given strings.
-	"""
 	m = [[0] * (1 + len(s2)) for i in range(1 + len(s1))]
 	longest, x_longest = 0, 0
 	for x in range(1, 1 + len(s1)):
@@ -89,8 +174,6 @@ def longest_common_substring(s1: str, s2: str) -> str:
 	return remove_redundant_whitespaces(result)
 
 def longest_common_subsequence(a: str, b: str) -> str:
-	""" Extract the longest subsequence from 2 given strings.
-	"""
 	lengths = [[0 for j in range(len(b)+1)] for i in range(len(a)+1)]
 	# row 0 and column 0 are initialized to 0 already
 	for i, x in enumerate(a):
@@ -128,8 +211,6 @@ def longest_match(lst: list) -> str:
 		return m
 
 def levenshtein_distance(token1: str, token2: str, normalize=True) -> dict:
-	""" Compute the levenshtein distance between 2 strings
-	"""
 	ldist = 0
 	ratio = 0
 
@@ -166,17 +247,6 @@ def remove_character(input_text: str, character: str):
 	return re.sub(character,'', input_text.rstrip()).lstrip()
 	
 def remove_keywords(input_text: str, to_lower=False, keywords=['cedex', 'Cedex', 'CEDEX']) -> str:
-	""" Remove some particular keywords in a given string
-
-	Args:
-		input_text(string): given string
-		to_lower(bool): if True converts all uppercase characters in the given string into lowercase
-		keywords(list): list of keywords to remove
-
-	Return:
-		cleaned string
-	"""
-
 	if to_lower:
 		output_text = input_text.lower()
 	else:

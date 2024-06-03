@@ -1,3 +1,46 @@
+"""
+Collection of utility functions for working with geographic data in Python.
+
+This module provides a collection of functions and classes for working with geographic data, including:
+* Latitude/Longitude Handling.
+* Coordinate Transformations.
+* Distance Calculations.
+* Unit Conversions.
+* Nearest Point Finding.
+* Format Transformations (Polyline Decoding, Shapely Conversion).
+
+**Constants**
+* `EARTH_RADIUS`: The Earth's radius in kilometers (6378.388). See [Earth Radius in Wikipedia](https://en.wikipedia.org/wiki/Earth_radius).
+* `POINT`: A list of attributes defining the structure of a Point object.
+
+**Latitude/Longitude Handling**
+* `latlon`: Extracts latitude and longitude from various input formats, such as dictionaries, lists, tuples, and Shapely points.
+* `latlon2str`: Converts latitude and longitude to a string representation.
+
+**Coordinate Transformations**
+* `gps2xy`: Converts Earth-centered coordinates (latitude, longitude) to Cartesian (x,y,z) coordinates.
+
+**Distance Calculations**
+* `distance_euclidean`: Calculates the Euclidean distance between two points.
+* `distance_manhattan`: Calculates the Manhattan distance (or Taxicab geometry) between two points.
+* `distance_haversine`: Calculates the geographical distance (or great-circle) between two points using the Haversine formula.
+
+**Unit Conversions**
+* `kilometers_to_miles`: Converts kilometers to miles.
+* `miles_to_kilometers`: Converts miles to kilometers.
+
+**Nearest Point Finding**
+* `find_nearest_point`: Finds the nearest point from a given row to a set of destination points based on a specified column.
+
+**Polyline Decoding**
+* `decode_polyline`: Decodes a polyline encoded string into a list of latitude/longitude coordinates.
+
+**Shapely Conversion**
+* `to_shapely`: Converts a list of coordinates into a Shapely MultiLineString object.
+
+**Class Point**
+*  Class `Point` provides a convenient way to represent and work with geographic points in your applications.
+"""
 import numpy
 import json
 import polyline
@@ -12,11 +55,39 @@ from gistools.utils     import is_list, is_float, format_float, is_integer
 from gistools.utils     import none_dict
 from gistools.plus_code import encode
 
-EARTH_RADIUS = 6378.388 # https://en.wikipedia.org/wiki/Earth_radius
+EARTH_RADIUS = 6378.388 
+""" The Earth's radius in kilometers (6378.388). See [Earth Radius in Wikipedia](https://en.wikipedia.org/wiki/Earth_radius)."""
 
-__all__ = ['EARTH_RADIUS', 'POINT', 'Point']
+__all__ = [
+	'EARTH_RADIUS', 
+	'latlon', 
+	'latlon2str', 
+	'gps2xy', 
+	'distance_euclidean', 
+	'distance_manhattan', 
+	'distance_haversine',
+	'kilometers_to_miles',
+	'miles_to_kilometers',
+	'find_nearest_point',
+	'decode_polyline',
+	'to_shapely',
+	'POINT', 
+	'Point'
+]
 
 def latlon(arg):
+	"""
+	Extracts latitude and longitude from various input formats.
+
+	Args:  
+	- **arg (dict, list, tuple, shapely.geometry.Point)**: The input containing lat/lng information.
+
+	Returns:  
+	- **tuple**: A tuple containing (latitude, longitude) if successful, otherwise (None, None).
+
+	Raises:  
+	- **TypeError**: If the input format is not recognized.
+	"""
 	if isinstance(arg, shapely.geometry.Point):
 		return arg.y, arg.x
 
@@ -47,11 +118,29 @@ def latlon(arg):
 	return None, None
 
 def latlon2str(latitude, longitude):
+	"""
+	Converts latitude and longitude to a string representation.
+
+	Args:
+	- **latitude (float)**: The latitude value.  
+	- **longitude (float)**: The longitude value.    
+
+	Returns:  
+	- **str**: The formatted latitude/longitude string in the format "latitude,longitude".
+	"""
 	return '%s,%s' % (format_float(latitude), format_float(longitude))
 
 def gps2xy(lat, lng):
-	""" Convert Earth-centered coordinates given as latitude and longitude (WGS84) to Cartesian (x,y,z) coordinates. 
-	# http://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
+	"""
+	Converts Earth-centered coordinates (latitude, longitude) to Cartesian (x,y,z) coordinates.  
+	See [stackoverflow](http://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates).
+
+	Args:  
+	- **lat (float)**: Latitude in degrees.  
+	- **lng (float)**: Longitude in degrees.  
+
+	Returns:  
+	- **dict**: A dictionary containing 'x', 'y', and 'z' Cartesian coordinates.		
 	"""
 	lat_rad = radians(lat)
 	lng_rad = radians(lng)
@@ -63,8 +152,16 @@ def gps2xy(lat, lng):
 	return {'x': x, 'y': y, 'z': z}
 
 def distance_euclidean(p1, p2):
-	""" Return the Euclidean distance between p1 and p2.
-	https://en.wikipedia.org/wiki/Euclidean_distance
+	"""
+	Calculates the Euclidean distance between two points.  
+	$d(p1, p2) = \sqrt(p1 - p2)^2$
+
+	Args:  
+	- **p1 (dict)**: A dictionary containing 'x' and 'y' coordinates of the first point.  
+	- **p2 (dict)**: A dictionary containing 'x' and 'y' coordinates of the second point.  
+
+	Returns:  
+	- **float**: The Euclidean distance between the two points.
 	"""
 	dx = p1['x'] - p2['x']
 	dy = p1['y'] - p2['y']
@@ -74,7 +171,15 @@ def distance_euclidean(p1, p2):
 	return dist 
 	
 def distance_manhattan(p1, p2): 
-	""" Return the Manhattan distance (or Taxicab geometry) between p1 and p2.
+	"""
+	Calculates the Manhattan distance (or Taxicab geometry) between two points.
+
+	Args:  
+	- **p1 (dict)**: A dictionary containing 'x' and 'y' coordinates of the first point.  
+	- **p2 (dict)**: A dictionary containing 'x' and 'y' coordinates of the second point.  
+
+	Returns:  
+	- float: The Manhattan distance between the two points.
 	"""
 	dx = p1['x'] - p2['x']
 	dy = p1['y'] - p2['y']
@@ -84,7 +189,15 @@ def distance_manhattan(p1, p2):
 	return dist
 
 def distance_haversine(p1, p2):
-	""" Return the geographical distance (or great-circle) between p1 and p2 using the Haversine formula.
+	"""
+	Calculates the geographical distance (or great-circle) between two points using the Haversine formula.
+
+	Args:  
+	- **p1 (dict, list, tuple, shapely.geometry.Point)**: The first point.  
+	- **p2 (dict, list, tuple, shapely.geometry.Point)**: The second point.  
+
+	Returns:  
+	- **float**: The geographical distance in meters between the two points.
 	"""
 	c1 = latlon(p1)
 	c2 = latlon(p2)
@@ -101,16 +214,44 @@ def distance_haversine(p1, p2):
 	return dist
 
 def kilometers_to_miles(km, ratio = 0.621371):
-	""" Convert km to mi. 1 Kilometer = 0.621371 Mile
+	"""
+	Converts kilometers to miles. 1 Kilometer = 0.621371 Mile.
+
+	Args:  
+	- **km (float)**: The distance in kilometers.  
+	- **ratio (float, optional)**: The conversion ratio (1 Kilometer = 0.621371 Mile). Defaults to 0.621371.  
+
+	Returns:  
+	- **float**: The distance in miles.
 	"""
 	return km * ratio
 
 def miles_to_kilometers(mi, ratio = 0.621371):
-	""" Convert mi to km. 1 Kilometer = 0.621371 Mile
+	"""
+	Converts miles to kilometers. 1 Kilometer = 0.621371 Mile.
+
+	Args:  
+	- **mi (float)**: The distance in miles.  
+	- **ratio (float, optional)**: The conversion ratio (1 Kilometer = 0.621371 Mile). Defaults to 0.621371.  
+
+	Returns:  
+	- **float**: The distance in kilometers.
 	"""
 	return mi / ratio
 
 def find_nearest_point(row, destination, column, geom_col='geometry'):
+	"""
+	Finds the nearest point from a given row to a set of destination points based on a specified column.
+
+	Args:  
+	- **row (pandas.Series)**: The row containing the point to find the nearest point to.  
+	- **destination (pandas.DataFrame)**: The DataFrame containing the destination points.  
+	- **column (str)**: The column name in the destination DataFrame to retrieve the value from.  
+	- **geom_col (str, optional)**: The name of the geometry column in both row and destination. Defaults to 'geometry'.  
+
+	Returns:  
+	- **object**: The value from the specified column in the destination DataFrame corresponding to the nearest point.
+	"""
 	nearest_geom = nearest_points(row[geom_col], destination[geom_col].unary_union)
 	match_geom   = destination.loc[destination.geometry == nearest_geom[1]]
 	match_value  = match_geom[column].to_numpy()[0]
@@ -118,9 +259,27 @@ def find_nearest_point(row, destination, column, geom_col='geometry'):
 	return match_value
 
 def decode_polyline(encoded: str):
+	"""
+	Decodes a polyline encoded string into a list of latitude/longitude coordinates.
+
+	Args:  
+	- **encoded (str)**: The encoded polyline string.  
+
+	Returns:  
+	- **list**: A list of [longitude, latitude] coordinates.
+	"""
 	return [[lon, lat] for lat, lon in polyline.decode(encoded)]
 
 def to_shapely(points): 
+	"""
+	Converts a list of coordinates into a Shapely MultiLineString object.
+
+	Args:  
+	- **points (list)**: A list of [longitude, latitude] coordinates.  
+
+	Returns:  
+	- **shapely.geometry.MultiLineString**: The Shapely MultiLineString object representing the points.  
+	"""
 	return MultiLineString([points])
 
 #==============================================================================
@@ -139,40 +298,54 @@ POINT = [
 	'plus_code',
 	'geometry'
 ]
+""" A list of attributes defining the structure of a Point object."""
 
 class Point:
 	"""
 	Represents a geographic point with latitude, longitude, and optional metadata.
 
-	Attributes:
-		id (str, optional): Unique identifier for the point.
-		external_id (str, optional): External identifier for the point.
-		name (str, optional): Name of the point.
-		description (str, optional): Description of the point.
-		longitude (float): Longitude coordinate of the point.
-		latitude (float): Latitude coordinate of the point.
-		plus_code (str, optional): Plus Code representation of the point.
-		geometry (dict, optional): GeoJSON representation of the point.
-		code_length (int): Length of the Plus Code to generate. Defaults to 10.
+	Attributes:  
+		- `id`(str, optional): Unique identifier for the point.  
+		- `external_id`(str, optional): External identifier for the point.  
+		- `name`(str, optional): Name of the point.  
+		- `description`(str, optional): Description of the point.  
+		- `longitude`(float): Longitude coordinate of the point.  
+		- `latitude`(float): Latitude coordinate of the point.  
+		- `plus_code`(str, optional): Plus Code representation of the point.  
+		- `code_length`(int): Length of the Plus Code to generate. Defaults to 10.  
 
-	Example:
-		>>> point = Point({'latitude': 37.7749, 'longitude': -122.4194})
-		>>> point.id = '12345'
-		>>> point.name = 'Golden Gate Bridge'
-		>>> print(point.plus_code)
-		>>> print(point.to_WKT())
-		>>> print(point.to_json())
+	Methods:  
+		- `__init__`(data=None, code_length=10): Initializes a Point object.  
+		- `__repr__`(): Returns a string representation of the Point object.  
+		- `__getitem__`(key): Allows accessing attributes as dictionary keys.  
+		- `__setitem__`(key, value): Allows setting attributes as dictionary keys.  
+		- `__eq__`(other): Checks if two Point objects are equal based on their data.  
+		- `__ne__`(other): Checks if two Point objects are not equal based on their data.  
+		- `data`: Returns the data dictionary containing all attributes.  
+		- `id`: Returns the ID of the point.  
+		- `name`: Returns the name of the point.  
+		- `latitude`: Returns the latitude of the point.  
+		- `longitude`: Returns the longitude of the point.  
+		- `coordinates`: Returns a tuple of latitude and longitude coordinates.  
+		- `code_length`: Returns the length of the Plus Code.  
+		- `plus_code`: Returns the Plus Code representation of the point.  
+		- `copy()`: Returns a shallow copy of the Point object.  
+		- `deepcopy()`: Returns a deep copy of the Point object.  
+		- `distance`(other): Calculates the Haversine distance between this point and another.  
+		- `to_dict`(): Returns the data dictionary containing all attributes.  
+		- `to_json`(indent=4): Serializes the object to a JSON formatted string.  
+		- `to_WKT`(precision=6): Returns the Well-Known Text (WKT) representation of the point.  
 	"""
 	def __init__(self, data=None, code_length=10):
 		"""
 		Initializes a Point object.
 
 		Args:
-			data (dict, optional): Dictionary containing point data. Defaults to None.
-			code_length (int, optional): Length of the Plus Code to generate. Defaults to 10.
+		- **data (dict, optional)**: Dictionary containing point data. Defaults to None.
+		- **code_length (int, optional)**: Length of the Plus Code to generate. Defaults to 10.
 
 		Raises:
-			TypeError: If data is not a dictionary.
+		- **TypeError**: If data is not a dictionary.
 		"""
 		self._data = none_dict(POINT)
 		self._code_length = code_length
@@ -257,6 +430,20 @@ class Point:
 		self._data['id'] = value
 
 	@property
+	def external_id(self):
+		"""
+		Returns the external identifier of the point.
+		"""
+		return self._data.get('external_id', None)
+
+	@external_id.setter
+	def external_id(self, value):
+		"""
+		Sets the external identifier of the point.
+		"""
+		self._data['external_id'] = value
+
+	@property
 	def name(self):
 		"""
 		Returns the name of the point.
@@ -269,6 +456,20 @@ class Point:
 		Sets the name of the point.
 		"""
 		self._data['name'] = value
+
+	@property
+	def description(self):
+		"""
+		Returns the description of the point.
+		"""
+		return self.data.get('description', None)
+
+	@description.setter
+	def description(self, value):
+		"""
+		Sets the description of the point.
+		"""
+		self._data['description'] = value
 
 	@property
 	def latitude(self):
@@ -293,14 +494,23 @@ class Point:
 
 	@property
 	def code_length(self):
+		"""
+		Returns the length of the Plus Code.
+		"""
 		return self._code_length
 	
 	@code_length.setter
 	def code_length(self, code_length):
+		"""
+		Sets the length of the Plus Code.
+		"""
 		self._code_length = code_length
 
 	@property
 	def plus_code(self):
+		"""
+		Returns the Plus Code representation of the point.
+		"""
 		return self._data.get('plus_code', None)
 
 	#--------------------------------------------------------------------------
@@ -308,9 +518,15 @@ class Point:
 	#--------------------------------------------------------------------------
 
 	def copy(self):
+		"""
+		Returns a shallow copy of the Point object.
+		"""
 		return copy(self)
 	
 	def deepcopy(self):
+		"""
+		Returns a deep copy of the Point object.
+		"""
 		return deepcopy(self)
 
 	#--------------------------------------------------------------------------
@@ -318,6 +534,15 @@ class Point:
 	#--------------------------------------------------------------------------
 
 	def distance(self, other):
+		"""
+		Calculates the Haversine distance between this point and another.
+
+		Args:  
+		- **other (Point)**: The other point to calculate the distance to.
+
+		Returns:  
+		- **float**: The distance in meters between the two points.
+		"""
 		from_ = (self.latitude, self.longitude)
 		to_   = (other.latitude, other.longitude)
 
@@ -328,23 +553,36 @@ class Point:
 	#--------------------------------------------------------------------------
 
 	def to_dict(self):
+		"""
+		Returns the data dictionary containing all attributes.
+		"""
 		return self._data
 
 	def to_json(self, indent=4) -> str:
-		"""Serialize object to a JSON formatted string.
+		"""
+		Serialize object to a JSON formatted string.
 
 		Args:
-			indent (int, optional): object members will be pretty-printed with that indent level. 
-			An indent level of 0 will only insert newlines. 
-			None is the most compact representation. 
-			Defaults to 4.
+		- **indent (int, optional)**: object members will be pretty-printed with that indent level.   
+		An indent level of 0 will only insert newlines.  
+		None is the most compact representation. Defaults to 4.
 
 		Returns:
-			str: JSON representation of this object.
+		- **str**: JSON representation of this object.
 		"""
 		return json.dumps(self._data, indent=indent)
 
 	def to_WKT(self, precision=6):
+		"""
+		Returns the Well-Known Text (WKT) representation of the point.
+
+		Args:
+		- **precision(int, optional)**: the number of decimal places to round the coordinates to.   
+		Defaults to 6.
+
+		Returns:
+		- **str**: The WKT representation of the point.
+		"""
 		return 'POINT(%s %s)' % (round(self.longitude, precision), round(self.latitude, precision)) 
 	
 #EOF
