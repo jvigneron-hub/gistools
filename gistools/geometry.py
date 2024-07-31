@@ -35,21 +35,29 @@ This module provides a collection of functions and classes for working with geog
 **Polyline Decoding**
 * `decode_polyline`: Decodes a polyline encoded string into a list of latitude/longitude coordinates.
 
-**Shapely Conversion**
+**Conversion**
 * `to_shapely`: Converts a list of coordinates into a Shapely MultiLineString object.
+* `to_geo`: Converts a Pandas DataFrame to a GeoDataFrame.
+* 'to_h3': TO DO.
+* 'to_h3_boundaries': TO DO.
+* 'h3_to_latlng': TO DO.
 
 **Class Point**
 *  Class `Point` provides a convenient way to represent and work with geographic points in your applications.
 """
 import numpy
+import geopandas
 import json
 import polyline
 import shapely
+import h3
+import h3pandas
 
 from copy import copy, deepcopy
 from math import radians, cos, sin, asin, sqrt
 from shapely.ops import nearest_points
 from shapely.geometry import MultiLineString
+from pandas.core.frame import DataFrame
 
 from gistools.utils     import is_list, is_float, format_float, is_integer
 from gistools.utils     import none_dict
@@ -188,17 +196,7 @@ def distance_manhattan(p1, p2):
 
 	return dist
 
-def distance_haversine(p1, p2):
-	"""
-	Calculates the geographical distance (or great-circle) between two points using the Haversine formula.
-
-	Args:  
-	- **p1 (dict, list, tuple, shapely.geometry.Point)**: The first point.  
-	- **p2 (dict, list, tuple, shapely.geometry.Point)**: The second point.  
-
-	Returns:  
-	- **float**: The geographical distance in meters between the two points.
-	"""
+def distance_haversine(p1, p2, unit='km'):
 	c1 = latlon(p1)
 	c2 = latlon(p2)
 
@@ -209,9 +207,12 @@ def distance_haversine(p1, p2):
 
 	a = sin(dlat/2)**2 + cos(lat1)*cos(lat2)*sin(dlon/2)**2
 	c = 2*asin(sqrt(a))
-	dist = EARTH_RADIUS * c * 1000
 
-	return dist
+	dist = EARTH_RADIUS * c
+	if unit == 'meters':
+		dist *= 1000
+
+	return dist 
 
 def kilometers_to_miles(km, ratio = 0.621371):
 	"""
@@ -281,6 +282,36 @@ def to_shapely(points):
 	- **shapely.geometry.MultiLineString**: The Shapely MultiLineString object representing the points.  
 	"""
 	return MultiLineString([points])
+
+def to_geo(data: DataFrame, from_=('longitude', 'latitude'), epsg=4326) -> geopandas.GeoDataFrame:
+	if from_ == 'geometry':
+		gdf = geopandas.GeoDataFrame(
+			data=data, geometry=data['geometry'], crs="EPSG:{}".format(epsg)
+		)
+
+	else:
+		gdf = geopandas.GeoDataFrame(
+			data, geometry=geopandas.points_from_xy(x=data.get(from_[0]), y=data.get(from_[1]))
+		).set_crs(epsg=epsg)
+
+	return gdf
+
+def to_h3(data, resolution, h3_col='h3'):
+	def compute_h3(r, resolution):
+		return h3.geo_to_h3(
+			r['latitude'], r['longitude'], resolution
+		)
+
+	data[h3_col] = data.apply(compute_h3, resolution=resolution, axis='columns')
+
+	return data
+
+def to_h3_boundaries(data, h3_col='h3'):
+	return data.set_index(h3_col).h3.h3_to_geo_boundary()
+
+def h3_to_latlng(data, h3_col='h3'):
+	latlng = data[h3_col].apply(lambda x: pandas.Series(h3.h3_to_geo(x), index=['latitude', 'longitude']))
+	return pandas.concat([data[:], latlng[:]], axis='columns')
 
 #==============================================================================
 #

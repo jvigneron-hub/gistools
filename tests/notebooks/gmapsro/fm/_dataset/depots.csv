@@ -1,0 +1,3 @@
+depot_id,depot_name,org_name,formatted_address,maps_url,longitude,latitude,geometry,gmapsro_id
+S_TUC,FM Česká s.r.o.,FM Logistic,"Ke Spejcharu 351, 252 67 Tuchoměřice","https://maps.google.com/maps?ll=50.136635,14.276553&z=17&t=m&hl=en&gl=US&mapclient=apiv3&cid=18399480234761396403",14.2737472,50.1375674,POINT (14.2737472 50.1375674),0
+S_OLO,HUB Olomouc,FM Logistic,"Na Statkách 6-81, 783 01 Olomouc","https://maps.google.com/maps?ll=49.567893,17.205674&z=17&t=m&hl=en&gl=US&mapclient=apiv3&cid=11869075012322801471",17.2069867,49.5684373,POINT (17.2069867 49.5684373),1
