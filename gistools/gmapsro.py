@@ -68,30 +68,45 @@ class FleetRoutingEntity(geopandas.GeoDataFrame):
 
 		super().reset_index(drop=True, inplace=True)
 
-	def set_time_window(self, columns=('period', 'earliest_start_time', 'latest_end_time'), format_string='%Y-%m-%d %H:%M:%S'):
+	def set_time_window(self, columns=None, format_string='%Y-%m-%d %H:%M:%S'):
+		if columns is None:
+			columns = {
+				'period': 'period',
+				'time_window_start': 'time_window_start',
+				'time_window_end': 'time_window_end',
+				'start_timestamp': 'start_timestamp',
+				'end_timestamp': 'end_timestamp'
+			}
+
 		def to_datetime(r):
-			start_dt = r[columns[0]] + ' ' + r[columns[1]]
-			end_dt   = r[columns[0]] + ' ' + r[columns[2]]
+			start_dt = r[columns['period']] + ' ' + r[columns['time_window_start']]
+			end_dt   = r[columns['period']] + ' ' + r[columns['time_window_end']]
 			return [start_dt, end_dt]
 
-		if len(columns) == 3:
-			time_window = self.apply(lambda x: pandas.Series(to_datetime(x), index=['start_datetime', 'end_datetime']), axis='columns')
-			df = pandas.concat([self[:], time_window[:]], axis='columns')
-		else:
-			if 'start_datetime' in self.columns and 'end_datetime' in self.columns:
-				df = self[:]
-			else:
-				raise ValueError("Oops! Something went wrong!")
+		time_window = self.apply(lambda x: pandas.Series(to_datetime(x), index=['start_datetime', 'end_datetime']), axis='columns')
+		df = pandas.concat([self[:], time_window[:]], axis='columns')
+		
+		df[columns['start_timestamp']] = df['start_datetime'].apply(lambda s: str2timestamp(s, format_string=format_string))
+		df[columns['end_timestamp']]   = df['end_datetime'  ].apply(lambda s: str2timestamp(s, format_string=format_string))
 
-		df['start_timestamp'] = df['start_datetime'].apply(lambda s: str2timestamp(s, format_string=format_string))
-		df['end_timestamp']   = df['end_datetime'  ].apply(lambda s: str2timestamp(s, format_string=format_string))
-
-		self.__init__(df)
+		self.__init__(df.drop(columns=['start_datetime', 'end_datetime']))
 
 		return self
 
+	def set_lunch_break_time_window(self, format_string='%Y-%m-%d %H:%M:%S'):
+		return self.set_time_window(
+			columns = {
+				'period': 'period',
+				'time_window_start': 'lunch_break_time_window_start',
+				'time_window_end': 'lunch_break_time_window_end',
+				'start_timestamp': 'lunch_break_start_timestamp',
+				'end_timestamp': 'lunch_break_end_timestamp'
+			},
+			format_string=format_string
+		)
+
 	def where(self, expr):
-		self = where(self, expr)
+		self.__init__(where(self, expr))
 
 		return self
 
@@ -188,18 +203,17 @@ class FleetRouting(object):
 		global_start_time = 0
 		global_end_time = 0
 
-		if vehicles is not None:
-			if 'start_timestamp' in vehicles: 
-				if 'start_timestamp' in shipments:
-					global_start_time = min(vehicles['start_timestamp'].min(), shipments['start_timestamp'].min())
-				else:
-					global_start_time = min(vehicles['start_timestamp'].min())
+		if 'start_timestamp' in vehicles.columns:
+			if 'start_timestamp' in shipments.columns:
+				global_start_time = min(vehicles['start_timestamp'].min(), shipments['start_timestamp'].min())
+			else:
+				global_start_time = min(vehicles['start_timestamp'].min())
 
-			if 'end_timestamp' in vehicles: 
-				if 'end_timestamp' in shipments:
-					global_end_time = max(vehicles['end_timestamp'].max(), shipments['end_timestamp'].max())
-				else:
-					global_end_time = max(vehicles['end_timestamp'].max())
+		if 'end_timestamp' in vehicles.columns: 
+			if 'end_timestamp' in shipments.columns:
+				global_end_time = max(vehicles['end_timestamp'].max(), shipments['end_timestamp'].max())
+			else:
+				global_end_time = max(vehicles['end_timestamp'].max())
 
 		return global_start_time, global_end_time
 
@@ -568,42 +582,13 @@ class FleetRouting(object):
 		return self
 
 	@staticmethod
-	def __set_allowed_vehicles(visit, vehicles):
+	def __set_required_vehicles(visit, vehicles):
 		allowed_vehicles = []
 
-		tags = None
-		if 'tags' in visit.keys():
-			tokens = visit['tags'].split(self.tag_delimiter)
-			if len(tokens) and len(tokens[0]):
-				tags = tokens
+		print('ok')
 
-		forbidden_tags = None
-		if 'forbidden_tags' in visit.keys():
-			tokens = visit['forbidden_tags'].split(self.tag_delimiter)
-			if len(tokens) and len(tokens[0]):
-				forbidden_tags = tokens
-
-		if tags is not None or forbidden_tags is not None:
-			forbidd_vehicles = []
-
-			if tags is not None:
-				df = vehicles
-
-				for tag_ in tags:
-					df = df[df[tag_] == tag_] 
-				allowed_vehicles = df['gmapsro_id'].tolist()
-				
-			if forbidden_tags is not None:
-				df = vehicles
-
-				if tags is None:
-					allowed_vehicles = df['gmapsro_id'].tolist()
-
-				for tag_ in forbidden_tags:
-					df = df[df[tag_] == tag_]
-
-				forbidd_vehicles = df['gmapsro_id'].tolist()
-				allowed_vehicles = [item for item in allowed_vehicles if item not in forbidd_vehicles]
+		df = vehicles.where('required_vehicle_name', '==', required_vehicle)
+		allowed_vehicles = df['gmapsro_id'].tolist()
 
 		return allowed_vehicles
 
@@ -648,22 +633,27 @@ class FleetRouting(object):
 
 		return allowed_vehicles
 
-	@staticmethod
-	def __set_waypoint(entity, location_id=None):
-		waypoint = {}
+	def __set_location(self, entity, label=None):
+		location_id = None
 
-		if location_id is None:
-			lat = entity['latitude' ]
-			lng = entity['longitude']
+		if label is not None:
+			location_id = entity.get(label, None)
 
-		else:
-			l = self.locations.loc[
-				self.locations_dict[entity[label]]
-			]
+		if location_id is not None:
+			l = self.locations.loc[self.locations_dict[location_id]]
 
 			lat = l['latitude' ]
 			lng = l['longitude']
 
+		else:
+			lat = entity['latitude' ]
+			lng = entity['longitude']
+
+		return self.__set_waypoint(lat, lng)
+
+	@staticmethod
+	def __set_waypoint(lat, lng):
+		waypoint = {}
 
 		waypoint['location'] = {}
 		waypoint['location']['latLng'] = {}
@@ -812,7 +802,7 @@ class FleetRouting(object):
 			time_window = self.__set_time_window(visit, self.utc_offset)
 
 		task = {
-			"arrivalWaypoint": self.__set_waypoint(visit),
+			"arrivalWaypoint": self.__set_location(visit),
 			"duration" : '{:d}s'.format(_set_duration(visit, col_name='pickup_duration')),
 			"cost": visit.get('pickup_cost', 0),
 			"label": remove_character(visit['formatted_address'], ','),
@@ -828,7 +818,7 @@ class FleetRouting(object):
 			time_window = self.__set_time_window(visit, self.utc_offset)
 
 		task = {
-			"arrivalWaypoint": self.__set_waypoint(visit),
+			"arrivalWaypoint": self.__set_location(visit),
 			"duration" : '{:d}s'.format(_set_duration(visit)),
 			"cost": visit.get('delivery_cost', 0),
 			"label": remove_character(visit['formatted_address'], ','),
@@ -872,10 +862,13 @@ class FleetRouting(object):
 				"loadDemands": {}
 			}
 
-			if 'tags' in v.keys() or 'forbidden_tags' in v.keys():
-				shipment['allowedVehicleIndices'] = self.__set_allowed_vehicles(
-					v, self.vehicles, self.tag_delimiter
-				)
+			if 'required_vehicle_name' in v.keys():
+				shipment['allowedVehicleIndices'] = self.__set_required_vehicles(v, self.vehicles)
+			else:				
+				if 'tags' in v.keys() or 'forbidden_tags' in v.keys():
+					shipment['allowedVehicleIndices'] = self.__set_allowed_vehicles(
+						v, self.vehicles, self.tag_delimiter
+					)
 
 			for dimension in FLEET_DIMENSIONS:
 				if dimension in v.keys():
@@ -950,10 +943,10 @@ class FleetRouting(object):
 					vehicle['loadLimits'][dimension] = demand
 
 			if not v.get('start_at_first_location', False):
-				vehicle['startWaypoint'] = self.__set_waypoint(v, v.get('start_location_id'))
+				vehicle['startWaypoint'] = self.__set_location(v, label='start_location_id')
 			
 			if not v.get('end_at_last_location', False):
-				vehicle['endWaypoint'] = self.__set_waypoint(v, v.get('end_location_id'))
+				vehicle['endWaypoint'] = self.__set_location(v, label='end_location_id')
 
 			for dimension in ['route_duration', 'route_distance']:
 				if v.get('{}_limit'.format(dimension), 0) > 0:
@@ -976,18 +969,19 @@ class FleetRouting(object):
 			if len(tw_end):
 				vehicle['endTimeWindows'] = tw_end
 
-			if is_set(v, 'lunch_break_earliest_start_timestamp') and is_set(v, 'lunch_break_latest_start_timestamp'):
-				vehicle['breakRule'] = {}
-				vehicle['breakRule']['breakRequests'] = []
+			if v.get('lunch_break'):
+				if is_set(v, 'lunch_break_start_timestamp') and is_set(v, 'lunch_break_end_timestamp'):
+					vehicle['breakRule'] = {}
+					vehicle['breakRule']['breakRequests'] = []
 
-				break_request = {}
-				break_request['earliestStartTime'] = _convert_datetime(v['lunch_break_earliest_start_timestamp'], offset=self.utc_offset)
-				break_request['latestStartTime']   = _convert_datetime(v['lunch_break_latest_start_timestamp'], offset=self.utc_offset)
+					break_request = {}
+					break_request['earliestStartTime'] = _convert_datetime(v['lunch_break_start_timestamp'], offset=self.utc_offset)
+					break_request['latestStartTime']   = _convert_datetime(v['lunch_break_end_timestamp'], offset=self.utc_offset)
 
-				duration = v['lunch_break_duration']*60
-				break_request['minDuration'] = '{:d}s'.format(duration)
+					duration = v['lunch_break_duration']*60
+					break_request['minDuration'] = '{:d}s'.format(duration)
 
-				vehicle['breakRule']['breakRequests'].append(break_request)
+					vehicle['breakRule']['breakRequests'].append(break_request)
 
 			self.scenario['model']['vehicles'].append(vehicle)
 

@@ -16,6 +16,7 @@ The module aims to be user-friendly and concise, offering convenient solutions f
 * `has_method`: Checks if an object has a specific method. 
 * `get_class_name`: Retrieves the class name of the given object.
 * `get_class_attr`: Retrieves public attributes of a given class.
+* `is_colab`: Checks if a notebook is running in Google Colab.
 
 **Date/Time**
 * `isoformat_as_datetime`: Converts an ISO 8601 formatted string to a datetime object.
@@ -57,6 +58,7 @@ The module aims to be user-friendly and concise, offering convenient solutions f
 * `is_in_collection`: Checks if an element is present in a collection.
 * `remove_none`: Removes None values from a list.
 * `intersection`: Calculates the intersection of two lists.
+* `count_common_items`: Calculates the number of items in a list which are present in another list.
 * `itemgetter`: Gets a specific item from each element in a list of dictionaries.
 * `is_in_list`: Checks if all elements in a list are present in another list or pattern.
 * `is_in_list_of_dict`: Checks if a specific value exists for a given key within a list of dictionaries.
@@ -105,6 +107,7 @@ The module aims to be user-friendly and concise, offering convenient solutions f
 * `to_json`: Saves a dictionary to a JSON file.
 * `read_csv`: Reads a CSV file into a list of dictionaries.
 * `to_csv`: Saves data to a CSV file, handling lists of dictionaries, DataFrames, and GeoDataFrames. 
+* `get_pathname`: Returns the full pathname, handling Google Drive mounting if necessary and using environment variables for paths. 
 """
 import math
 import time
@@ -134,7 +137,8 @@ from pandas.core.frame import DataFrame
 #------------------------------------------------------------------------------
 
 def has_method(arg, method):
-	"""Checks if an object has a callable method with the given name.
+	"""
+	Checks if an object has a callable method with the given name.
 
 	Args:
 	- **arg**: The object to check for the method.
@@ -150,7 +154,8 @@ def has_method(arg, method):
 	return hasattr(arg, method) and callable(getattr(arg, method))
 
 def get_class_name(obj):
-	"""Retrieves the class name of the given object.
+	"""
+	Retrieves the class name of the given object.
 
 	This function takes an object of any type as input and returns the name
 	of the class to which it belongs. This can be useful for introspection
@@ -166,7 +171,8 @@ def get_class_name(obj):
 	return type(obj).__name__
 
 def get_class_attr(classname):
-	"""Retrieves public attributes of a given class.
+	"""
+	Retrieves public attributes of a given class.
 
 	This function takes the name of a class (`classname`) as input and returns
 	a list of its public attributes (excluding methods and dunder methods).
@@ -182,6 +188,15 @@ def get_class_attr(classname):
 	"""	
 	attributes = inspect.getmembers(classname, lambda x : not(inspect.isroutine(x)))
 	return [x for x in attributes if not(x[0].startswith('__') and x[0].endswith('__'))]
+
+def is_colab():
+	"""
+	This function checks if a notebook is running in Google Colab.
+
+	Returns:
+	- **boolean** = True  if the notebook is running in Google Colab, False otherwise.
+	"""
+	return 'google.colab' in str(get_ipython())
 
 #------------------------------------------------------------------------------
 # Date/Time
@@ -707,6 +722,24 @@ def intersection(list1_, list2_):
 	- A new **list** containing the elements present in both input lists.
 	"""
 	return list(set(list1_) & set(list2_))
+
+def count_common_items(list1_, list2_):
+	"""
+	Calculates the number of items in a list which are present in another list.
+
+	Args:
+	- **list1_**: The first list.
+	- **list2_**: The second list.
+
+	Returns:
+	- **integer** containing the number of common items.
+	"""
+	count = 0
+	for item in list2_:
+		if item in list1_:
+			count += 1
+
+	return count
 
 def itemgetter(l, key):
 	"""
@@ -1502,5 +1535,31 @@ def to_csv(data, filename, pathname=None, encoding='utf-8', delimiter=';', with_
 					writer.writerow(row)
 		except IOError:
 			print("Oops! Something went wrong.")
+
+def get_pathname(google_drive, folder=None):
+	"""
+	Returns the full pathname, handling Google Drive mounting if necessary and using environment variables for paths.
+
+	Args:
+		- **google_drive**: A boolean flag indicating whether to mount Google Drive.
+		- **folder**: An optional subfolder name to append to the pathname. Defaults to None.
+
+	Returns:
+		- **string** containing  the full pathname, including the mounted Google Drive root (if `google_drive` is True) and the specified subfolder (if `folder` is provided).
+	"""
+	if not google_drive:
+		pathname = os.environ.get('LOCAL_DATASET')
+
+	else:
+		from google.colab import drive
+
+		root = '/content/drive'
+		drive.mount('{}'.format(root), force_remount=True)
+		pathname = '{}/{}'.format(root, os.environ.get('DRIVE_DATASET'))
+
+	if folder is not None:
+		pathname = '{}/{}'.format(pathname, folder)
+
+	return pathname
 
 #EOF
