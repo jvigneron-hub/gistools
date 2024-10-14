@@ -1,6 +1,6 @@
 import inspect
 
-from gistools.utils     import is_numeric, merge_dicts
+from gistools.utils     import is_numeric, is_integer, merge_dicts
 from gistools.geometry  import Point
 from gistools.plus_code import encode
 from gistools.strings   import normalize, similarity, clean
@@ -189,6 +189,10 @@ class Place(Point):
 	@components.setter
 	def components(self, value):
 		self._components = value
+
+	@property
+	def is_fr(self):
+		return self.components['country'].lower() == 'fr' or self.components['country'].lower() == 'france'
 
 	@property
 	def response(self):
@@ -704,7 +708,7 @@ class Place(Point):
 			query = ''
 			for field in fields:
 				if record[field] != 0:
-					query += str(record[field]) + ' '
+					query += '{} '.format(record[field])
 
 			query = clean(query)
 			query = normalize(query) if query is not None else '' 
@@ -1428,7 +1432,12 @@ class Place(Point):
 			print('longitude:                ', '%.6f' % self.longitude) 
 			print('latitude:                 ', '%.6f' % self.latitude) 
 			print('confidence:               ', '%.2f' % self.confidence) 
+			print('confidence on addr:       ', '%.2f' % self.confidence_on_addr)
+			print('confidence on city:       ', '%.2f' % self.confidence_on_city)
+			print('confidence on postal code:', '%.0f' % self.confidence_on_postal_code)
+			print('confidence on country:    ', '%.2f' % self.confidence_on_country)
 			print('location type:            ', self.location_type)
+			print('accepted:                 ', self.accepted)
 
 		else:
 			print('id:                       ', self.id)

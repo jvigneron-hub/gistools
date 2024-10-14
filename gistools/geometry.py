@@ -41,11 +41,13 @@ This module provides a collection of functions and classes for working with geog
 * 'to_h3': TO DO.
 * 'to_h3_boundaries': TO DO.
 * 'h3_to_latlng': TO DO.
+* 'get_convex_hull': Calculates the convex hull of a GeoDataFrame containing POINT geometries.
 
 **Class Point**
 *  Class `Point` provides a convenient way to represent and work with geographic points in your applications.
 """
 import numpy
+import pandas
 import geopandas
 import json
 import polyline
@@ -55,8 +57,8 @@ import h3pandas
 
 from copy import copy, deepcopy
 from math import radians, cos, sin, asin, sqrt
-from shapely.ops import nearest_points
-from shapely.geometry import MultiLineString
+from shapely.ops import nearest_points, cascaded_union
+from shapely.geometry import MultiLineString, Polygon, MultiPoint
 from pandas.core.frame import DataFrame
 
 from gistools.utils     import is_list, is_float, format_float, is_integer
@@ -312,6 +314,22 @@ def to_h3_boundaries(data, h3_col='h3'):
 def h3_to_latlng(data, h3_col='h3'):
 	latlng = data[h3_col].apply(lambda x: pandas.Series(h3.h3_to_geo(x), index=['latitude', 'longitude']))
 	return pandas.concat([data[:], latlng[:]], axis='columns')
+
+def get_convex_hull(gdf):
+	"""
+		Calculates the convex hull of a GeoDataFrame containing POINT geometries.
+	
+	Args:
+	- **gdf** (geopandas.GeoDataFrame): Input GeoDataFrame with POINT geometry.
+	
+	Returns:
+	- **geopandas.GeoDataFrame**:  A GeoDataFrame containing the convex hull polygon.
+	"""
+	all_points = MultiPoint(list(gdf.geometry)) # Extract all points from the GeoDataFrame.
+	convex_hull = all_points.convex_hull # Calculate the convex hull polygon.
+	convex_hull_gdf = geopandas.GeoDataFrame(geometry=[convex_hull], crs=gdf.crs) # Create a new GeoDataFrame for the convex hull.
+
+	return convex_hull_gdf
 
 #==============================================================================
 #
