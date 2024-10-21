@@ -17,6 +17,7 @@ The module aims to be user-friendly and concise, offering convenient solutions f
 * `get_class_name`: Retrieves the class name of the given object.
 * `get_class_attr`: Retrieves public attributes of a given class.
 * `is_colab`: Checks if a notebook is running in Google Colab.
+* `get_package_version`: Gets the version of an installed Python package.
 
 **Date/Time**
 * `isoformat_as_datetime`: Converts an ISO 8601 formatted string to a datetime object.
@@ -127,6 +128,7 @@ import csv
 import pickle
 import collections
 import pytz
+import pkg_resources
 
 from operator import eq, ne, lt, le, gt, ge
 from datetime import datetime, timezone
@@ -197,6 +199,21 @@ def is_colab():
 	- **boolean** = True  if the notebook is running in Google Colab, False otherwise.
 	"""
 	return 'google.colab' in str(get_ipython())
+
+def get_package_version(package_name):
+	"""
+	Gets the version of an installed Python package.
+
+	Args:
+	- **package_name**: The name of the package.
+
+	Returns:
+	- **string**: The version of the package as a string, or None if the package is not found.
+	"""
+	try:
+		return pkg_resources.get_distribution(package_name).version
+	except pkg_resources.DistributionNotFound:
+		return None
 
 #------------------------------------------------------------------------------
 # Date/Time

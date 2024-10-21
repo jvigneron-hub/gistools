@@ -585,9 +585,7 @@ class FleetRouting(object):
 	def __set_required_vehicles(visit, vehicles):
 		allowed_vehicles = []
 
-		print('ok')
-
-		df = vehicles.where('required_vehicle_name', '==', required_vehicle)
+		df = vehicles[vehicles['vehicle_name'] == visit['required_vehicle_name']]
 		allowed_vehicles = df['gmapsro_id'].tolist()
 
 		return allowed_vehicles
@@ -855,6 +853,8 @@ class FleetRouting(object):
 		return task
 
 	def __set_shipments(self):
+		self.scenario['model']['precedence_rules'] = []
+
 		for v in self.shipments.to_dict(orient='records'):
 			shipment = {
 				"label": '{}'.format(v['shipment_name']),
@@ -899,7 +899,22 @@ class FleetRouting(object):
 
 			self.scenario['model']['shipments'].append(shipment)
 
+			if 'previous_shipment_id' in v.keys():
+				if v['previous_shipment_id'] != -1:
+					previous_visit = self.shipments.loc[self.shipments['shipment_id'] == v['previous_shipment_id']].to_dict(orient='records')[0]
+
+					self.scenario['model']['precedence_rules'].append({
+						'firstIndex'       : previous_visit['gmapsro_id'],
+						'secondIndex'      : v['gmapsro_id'],
+						'firstIsDelivery'  : self.is_delivery(v),
+						'secondIsDelivery' : self.is_delivery(previous_visit)
+					})
+
 		return self
+
+	@staticmethod
+	def is_delivery(visit):
+		return True if visit['shipment_type'] == 'delivery' else False
 
 	@staticmethod
 	def __set_vehicle_working_hours(vehicle, utc_offset):
@@ -1057,7 +1072,10 @@ class FleetRouting(object):
 				df = pandas.DataFrame(r['visits'])
 				df = df.reset_index(drop=True)
 
-				df['vehicleIndex'] = r['vehicleIndex']
+				if 'vehicleIndex' in r:
+					df['vehicleIndex'] = r['vehicleIndex']
+				else:
+					df['vehicleIndex'] = 0
 				df['vehicleLabel'] = r['vehicleLabel']
 
 				df['assigned_route_order_id'] = add_to(df.index.tolist(), value=1)
@@ -1085,7 +1103,7 @@ class FleetRouting(object):
 		if self.shipments is not None:
 			visits = pandas.merge(
 				left=visits, 
-				right=self.shipments.reset_index(drop=True), 
+				right=self.shipments.reset_index(drop=True).drop(columns=['vehicle_name']), 
 				left_on='gmapsro_id', 
 				right_on='gmapsro_id', 
 				how='inner'
@@ -1196,7 +1214,11 @@ class FleetRouting(object):
 
 			self._metrics['total_cost'] = self.response['metrics']['totalCost']
 			self._metrics['number_of_vehicles_used'] = self.response['metrics']['usedVehicleCount']
-			self._metrics['number_of_skipped_mandatory_shipments'] = self.response['metrics']['skippedMandatoryShipmentCount']
+
+			if 'skippedMandatoryShipmentCount' in self.response['metrics']:
+				self._metrics['number_of_skipped_mandatory_shipments'] = self.response['metrics']['skippedMandatoryShipmentCount']
+			else:
+				self._metrics['number_of_skipped_mandatory_shipments'] = 0
 
 			agg_metrics = self.response['metrics']['aggregatedRouteMetrics']
 
@@ -1310,7 +1332,7 @@ class FleetRouting(object):
 		if self._response is not None:
 			print('\nKPIs:')
 			print('   Number of routes: {:d}     '.format(self.number_of_routes))
-			print('   Skipped visits:   {:d}     '.format(self.number_of_skipped_visits))
+			print('   Skipped visits:   {:d}     '.format(self.number_of_skipped_mandatory_shipments))
 			print('   Productivity:     {:.1f}   '.format(self.overall_productivity))
 			print('   Distance:         {:.3f} km'.format(self.total_distance))
 			print('   Average distance: {:.3f} km'.format(self.total_distance/self.number_of_routes))
