@@ -68,33 +68,46 @@ class FleetRoutingEntity(geopandas.GeoDataFrame):
 
 		super().reset_index(drop=True, inplace=True)
 
-	def set_time_window(self, columns=None, format_string='%Y-%m-%d %H:%M:%S'):
-		if columns is None:
-			columns = {
-				'period': 'period',
-				'time_window_start': 'time_window_start',
-				'time_window_end': 'time_window_end',
-				'start_timestamp': 'start_timestamp',
-				'end_timestamp': 'end_timestamp'
-			}
-
+	def _set_time_window(self, columns, format_string='%Y-%m-%d %H:%M:%S'):
 		def to_datetime(r):
 			start_dt = r[columns['period']] + ' ' + r[columns['time_window_start']]
 			end_dt   = r[columns['period']] + ' ' + r[columns['time_window_end']]
 			return [start_dt, end_dt]
 
 		time_window = self.apply(lambda x: pandas.Series(to_datetime(x), index=['start_datetime', 'end_datetime']), axis='columns')
-		df = pandas.concat([self[:], time_window[:]], axis='columns')
+		df = pandas.concat([self, time_window], axis='columns')
 		
 		df[columns['start_timestamp']] = df['start_datetime'].apply(lambda s: str2timestamp(s, format_string=format_string))
 		df[columns['end_timestamp']]   = df['end_datetime'  ].apply(lambda s: str2timestamp(s, format_string=format_string))
 
-		self.__init__(df.drop(columns=['start_datetime', 'end_datetime']))
+		self.__init__(
+			df.drop(columns=['start_datetime', 'end_datetime'])
+		)
+
+		return self 
+
+	def set_time_window(self, format_string='%Y-%m-%d %H:%M:%S'):
+		self._set_time_window(
+			columns = {
+				'period': 'period',
+				'time_window_start': 'time_window_start',
+				'time_window_end': 'time_window_end',
+				'start_timestamp': 'start_timestamp',
+				'end_timestamp': 'end_timestamp'
+			},
+			format_string=format_string
+		)
+
+		if 'overtime_in_minutes' in self.columns:
+			def set_overtime(r):
+				return r['soft_end_timestamp'] + (r['overtime_in_minutes']*60)
+			self['soft_end_timestamp'] = self['end_timestamp']
+			self['end_timestamp'] = self.apply(set_overtime, axis='columns') 
 
 		return self
 
 	def set_lunch_break_time_window(self, format_string='%Y-%m-%d %H:%M:%S'):
-		return self.set_time_window(
+		self._set_time_window(
 			columns = {
 				'period': 'period',
 				'time_window_start': 'lunch_break_time_window_start',
@@ -105,8 +118,15 @@ class FleetRoutingEntity(geopandas.GeoDataFrame):
 			format_string=format_string
 		)
 
+		return self
+
 	def where(self, expr):
 		self.__init__(where(self, expr))
+
+		return self
+
+	def drop_columns(self, columns):
+		self.__init__(self.drop(columns=columns))
 
 		return self
 
@@ -906,8 +926,8 @@ class FleetRouting(object):
 					self.scenario['model']['precedence_rules'].append({
 						'firstIndex'       : previous_visit['gmapsro_id'],
 						'secondIndex'      : v['gmapsro_id'],
-						'firstIsDelivery'  : self.is_delivery(v),
-						'secondIsDelivery' : self.is_delivery(previous_visit)
+						'firstIsDelivery'  : self.is_delivery(previous_visit),
+						'secondIsDelivery' : self.is_delivery(v)
 					})
 
 		return self
@@ -928,6 +948,11 @@ class FleetRouting(object):
 		if is_set(vehicle, 'end_timestamp'):
 			tw = {}
 			tw['endTime'] = _convert_datetime(vehicle['end_timestamp'], offset=utc_offset)
+
+			if is_set(vehicle, 'soft_end_timestamp'):
+				tw['softEndTime'] = _convert_datetime(vehicle['soft_end_timestamp'], offset=utc_offset)
+				tw['costPerHourAfterSoftEndTime'] = vehicle.get('cost_per_hour_after_soft_end_time', 0)
+
 			tw_end.append(tw)
 
 		return tw_start, tw_end
@@ -985,6 +1010,7 @@ class FleetRouting(object):
 				vehicle['endTimeWindows'] = tw_end
 
 			if v.get('lunch_break'):
+
 				if is_set(v, 'lunch_break_start_timestamp') and is_set(v, 'lunch_break_end_timestamp'):
 					vehicle['breakRule'] = {}
 					vehicle['breakRule']['breakRequests'] = []
