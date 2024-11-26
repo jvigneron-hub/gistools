@@ -12,7 +12,7 @@ from google.protobuf.json_format import MessageToJson
 from google.maps import routeoptimization_v1
 
 from gistools.utils    import *
-from gistools.strings  import remove_character
+from gistools.strings  import remove_character, str2list
 from gistools.geometry import Point, decode_polyline, to_shapely, to_geo
 
 FLEET_DIMENSIONS = [
@@ -184,6 +184,7 @@ class FleetRouting(object):
 		self._metrics = {}
 		self._elapsed_time = 0
 		self._tag_delimiter = '-'
+		self._load_multiplier = 1
 
 		self._protobuf_request = routeoptimization_v1.OptimizeToursRequest()
 		self._protobuf_request.populate_polylines = True
@@ -211,6 +212,14 @@ class FleetRouting(object):
 		self._solution = {}
 
 	@staticmethod
+	def __set_demand(d, k):
+		return str(d*k)
+
+	@staticmethod
+	def __get_demand(d, k):
+		return int(d)//k
+
+	@staticmethod
 	def __set_gmapsro_index(data, col_name):
 		data = data.reset_index(drop=True)
 		data[col_name] = data.index.tolist()
@@ -227,18 +236,15 @@ class FleetRouting(object):
 			if 'start_timestamp' in shipments.columns:
 				global_start_time = min(vehicles['start_timestamp'].min(), shipments['start_timestamp'].min())
 			else:
-				global_start_time = min(vehicles['start_timestamp'].min())
+				global_start_time = vehicles['start_timestamp'].min()
 
 		if 'end_timestamp' in vehicles.columns: 
 			if 'end_timestamp' in shipments.columns:
 				global_end_time = max(vehicles['end_timestamp'].max(), shipments['end_timestamp'].max())
 			else:
-				global_end_time = max(vehicles['end_timestamp'].max())
+				global_end_time = vehicles['end_timestamp'].max()
 
 		return global_start_time, global_end_time
-
-	def set_fleet(self, depot_id, no_vehicles, available_periods=None):
-		return self
 
 	def __repr__(self) -> str:
 		return '<{}>'.format(getattr(self, '__name__', self.__class__.__name__))
@@ -513,8 +519,16 @@ class FleetRouting(object):
 		return self._tag_delimiter
 
 	@tag_delimiter.setter
-	def tag_delimiter(self, tag_delimiter):
-		self._tag_delimiter = tag_delimiter
+	def tag_delimiter(self, tag):
+		self._tag_delimiter = tag
+	
+	@property
+	def load_multiplier(self):
+		return self._load_multiplier
+
+	@load_multiplier.setter
+	def load_multiplier(self, load):
+		self._load_multiplier = load
 	
 	def set_config(self, **kwargs):
 		for k, v in kwargs.items():
@@ -548,6 +562,8 @@ class FleetRouting(object):
 				self.utc_offset = v
 			elif k == 'tag_delimiter':
 				self.tag_delimiter = v
+			elif k == 'load_multiplier':
+				self.load_multiplier = v
 
 			else:
 				raise ValueError("Oops! Unknown parameter <{}>".format(k))
@@ -566,11 +582,14 @@ class FleetRouting(object):
 	def global_time_window(self):
 		return (self.global_start_time, self.global_end_time)
 
-	def save_scenario(self, pathname='.', filename='scenario.json'):
-		to_json(self.scenario, filename=filename, pathname=pathname)
+	def set_fleet(self, depot_id, no_vehicles, available_periods=None):
+		'''
+		TO DO
+		'''
 		return self
 
-	def load_scenario(self, pathname='.', filename='scenario.json'):
+	def save_scenario(self, pathname='.', filename='scenario.json'):
+		to_json(self.scenario, filename=filename, pathname=pathname)
 		return self
 
 	def build_scenario(self):
@@ -685,7 +704,6 @@ class FleetRouting(object):
 		time_window = []
 
 		if is_set(visit, 'start_timestamp') and is_set(visit, 'end_timestamp'):
-
 			tw = {}
 			tw['startTime'] = _convert_datetime(visit['start_timestamp'], offset=utc_offset)
 			tw['endTime']   = _convert_datetime(visit['end_timestamp'], offset=utc_offset)
@@ -703,30 +721,38 @@ class FleetRouting(object):
 
 	@staticmethod
 	def __set_time_window_from_calendar(visit, calendar, utc_offset):
-		time_window = []
+		time_windows = []
+		periods = []
 
-		day_no = v['weekday']
+		days = visit['periods']
 
-		if is_integer(day_no):
-			periods = [day_no]
-		else:
-			if '-' in day_no:
-				start, end = map(int, day_no.split('-'))
+		if isinstance(days, str):
+			if '-' in days:
+				start, end = map(int, days.split('-'))
 				periods = list(range(start, end + 1))
-			elif ',' in day_no:
-				periods = [int(x) for x in day_no.split(',')]
+			elif ',' in days:
+				periods = str2list(days)
+
+		elif isinstance(days, list):
+			periods = days
+
+		elif is_integer(days):
+			periods = [days]
 
 		for p in periods:
 			tw = {}
 
-			t1 = str2timestamp('{} {}'.format(self.calendar[p], v['time_window_start']), format_string='%Y-%m-%d %H:%M:%S')
+			tw_start_label = visit.get('time_window_start_{}'.format(p), 'time_window_start')
+			tw_end_label   = visit.get('time_window_end_{}'.format(p),   'time_window_end')
+
+			t1 = str2timestamp('{} {}'.format(calendar[p], tw_start_label), format_string='%Y-%m-%d %H:%M:%S')
 			tw['startTime'] = _convert_datetime(t1, offset=utc_offset)
-			t2 = str2timestamp('{} {}'.format(self.calendar[p], v['time_window_end']),   format_string='%Y-%m-%d %H:%M:%S')
+			t2 = str2timestamp('{} {}'.format(calendar[p], tw_end_label),   format_string='%Y-%m-%d %H:%M:%S')
 			tw['endTime']   = _convert_datetime(t2, offset=utc_offset)
 
 			time_windows.append(tw)
 
-		return time_window
+		return time_windows
 
 	@staticmethod
 	def __set_opening_hours(visit, location):
@@ -827,6 +853,14 @@ class FleetRouting(object):
 			"timeWindows": time_window
 		}
 
+		for dimension in FLEET_DIMENSIONS:
+			pickup_dimension = 'pickup_{}'.format(dimension)
+			if pickup_dimension in visit.keys():
+				task['loadDemands'] = {}
+				demand = {}
+				demand['amount'] = self.__set_demand(visit[pickup_dimension], k=self.load_multiplier)
+				task['loadDemands'][dimension] = demand
+
 		return task
 
 	def __set_delivery(self, visit):
@@ -842,6 +876,14 @@ class FleetRouting(object):
 			"label": remove_character(visit['formatted_address'], ','),
 			"timeWindows": time_window
 		}
+
+		for dimension in FLEET_DIMENSIONS:
+			delivery_dimension = 'delivery_{}'.format(dimension)
+			if 'delivery_{}'.format(dimension) in visit.keys():
+				task['loadDemands'] = {}
+				demand = {}
+				demand['amount'] = self.__set_demand(visit[delivery_dimension], k=self.load_multiplier)
+				task['loadDemands'][dimension] = demand
 
 		return task
 
@@ -893,10 +935,14 @@ class FleetRouting(object):
 			for dimension in FLEET_DIMENSIONS:
 				if dimension in v.keys():
 					demand = {}
-					demand['amount'] = str(v[dimension])
+					demand['amount'] = self.__set_demand(v[dimension], k=self.load_multiplier)
 					shipment['loadDemands'][dimension] = demand
 
 			match v.get('shipment_type'):
+				case 'pickup_and_delivery':
+					shipment['pickups']    = [self.__set_pickup(v)]
+					shipment['deliveries'] = [self.__set_delivery(v)]
+
 				case 'store_pickup_and_delivery':
 					shipment['pickups'] = [self.__set_pickup_at_store_location(v)]
 					shipment['deliveries'] = [self.__set_delivery(v)]
@@ -975,33 +1021,49 @@ class FleetRouting(object):
 				if dimension in v.keys():
 					demand = {}
 
-					demand['maxLoad'] = str(v[dimension])
+					demand['maxLoad'] = self.__set_demand(v[dimension], k=self.load_multiplier)
 					if is_set(v, '{}_soft_max'.format(dimension)):
-						demand['softMaxLoad'] = str(v.get('{}_soft_max'.format(dimension)))
+						demand['softMaxLoad'] = self.__set_demand(v.get('{}_soft_max'.format(dimension)), self.load_multiplier)
 						demand['costPerUnitAboveSoftMax'] = v.get('{}_cost_per_unit_above_soft_max'.format(dimension))
 
 					vehicle['loadLimits'][dimension] = demand
 
-			if not v.get('start_at_first_location', False):
+			if v.get('start_at_first_location', True):
 				vehicle['startWaypoint'] = self.__set_location(v, label='start_location_id')
 			
-			if not v.get('end_at_last_location', False):
+			if v.get('end_at_last_location', True):
 				vehicle['endWaypoint'] = self.__set_location(v, label='end_location_id')
 
 			for dimension in ['route_duration', 'route_distance']:
-				if v.get('{}_limit'.format(dimension), 0) > 0:
-					vehicle['routeDurationLimit'] = {
-						'maxDuration': '{:d}s'.format(v['{}_limit'.format(dimension)]*60)
-					}
-					if is_set(v, '{}_limit_soft_max'.format(dimension)):
-						soft_limit = int(v['{}_limit_soft_max'.format(dimension)])
+				label = ''
 
-						if (soft_limit) > 0:
-							vehicle['routeDurationLimit']['softMaxDuration'] = '{:d}s'.format(soft_limit*60)
-							vehicle['routeDurationLimit']['costPerHourAfterSoftMax'] = v.get(
-								'{}_limit_cost_per_hour_after_soft_max'.format(dimension), 0
-							)
+			dimension = 'route_duration'
+			if v.get('{}_limit'.format(dimension), 0) > 0:
+				vehicle['routeDurationLimit'] = {
+					'maxDuration': '{:d}s'.format(v['{}_limit'.format(dimension)]*60)
+				}
+				if is_set(v, '{}_limit_soft_max'.format(dimension)):
+					soft_limit = int(v['{}_limit_soft_max'.format(dimension)])
 
+					if (soft_limit) > 0:
+						vehicle['routeDurationLimit']['softMaxDuration'] = '{:d}s'.format(soft_limit*60)
+						vehicle['routeDurationLimit']['costPerHourAfterSoftMax'] = v.get(
+							'{}_limit_cost_per_hour_after_soft_max'.format(dimension), 0
+						)
+
+			dimension = 'route_distance'
+			if v.get('{}_limit'.format(dimension), 0) > 0:
+				vehicle['routeDistanceLimit'] = {
+					'maxMeters': '{:d}'.format(v['{}_limit'.format(dimension)]*1000)
+				}
+				if is_set(v, '{}_limit_soft_max'.format(dimension)):
+					soft_limit = int(v['{}_limit_soft_max'.format(dimension)])
+
+					if (soft_limit) > 0:
+						vehicle['routeDistanceLimit']['softMaxMeters'] = '{:d}'.format(soft_limit*1000)
+						vehicle['routeDistanceLimit']['costPerKilometerAfterSoftMax'] = v.get(
+							'{}_limit_cost_per_hour_after_soft_max'.format(dimension), 0
+						)
 			tw_start, tw_end = self.__set_vehicle_working_hours(v, self.utc_offset)
 
 			if len(tw_start):
@@ -1066,16 +1128,15 @@ class FleetRouting(object):
 		if not filename.lower().endswith('.zip'):
 			raise ValueError("Oups! Something went wrong.")
 
-		else:
-			self.save_scenario(filename='scenario.json')
-			self.save_solution(filename='solution.json')
+		self.save_scenario(filename='scenario.json')
+		self.save_solution(filename='solution.json')
 
-			with zipfile.ZipFile(ospathjoin(pathname, filename), 'w') as f:
-				f.write('scenario.json')
-				f.write('solution.json')
+		with zipfile.ZipFile(ospathjoin(pathname, filename), 'w') as f:
+			f.write('scenario.json')
+			f.write('solution.json')
 
-			os.remove('scenario.json')
-			os.remove('solution.json')
+		os.remove('scenario.json')
+		os.remove('solution.json')
 
 		return self
 
@@ -1126,10 +1187,15 @@ class FleetRouting(object):
 			'orderId'      : 'assigned_route_order_id'
 		})
 
+		if 'vehicle_name' in self.shipments:
+			shipments = self.shipments.drop(columns=['vehicle_name'])
+		else:
+			shipments = self.shipments
+
 		if self.shipments is not None:
 			visits = pandas.merge(
 				left=visits, 
-				right=self.shipments.reset_index(drop=True).drop(columns=['vehicle_name']), 
+				right=shipments.reset_index(drop=True), 
 				left_on='gmapsro_id', 
 				right_on='gmapsro_id', 
 				how='inner'
@@ -1196,7 +1262,7 @@ class FleetRouting(object):
 			if 'maxLoads' in r:
 				for k, v in r.get('maxLoads').items():
 					if k in FLEET_DIMENSIONS:
-						r[k] = int(v.get('amount'))
+						r[k] = self.__get_demand(v.get('amount'), k=load_multiplier)
 
 		assigned_routes = pandas.DataFrame(assigned_routes)
 		assigned_routes = assigned_routes.reindex(columns=list(columns.keys())+FLEET_DIMENSIONS)
@@ -1218,7 +1284,7 @@ class FleetRouting(object):
 		assigned_routes['distance_text'] = assigned_routes['distance'].apply(lambda x: '{:,.1f} km'.format(x))
 
 		for k in time_metrics:
-			assigned_routes[k] = assigned_routes[k].apply(lambda s: int(s[:-1])//60)
+			assigned_routes[k] = assigned_routes[k].apply(lambda s: int(s[:-1]))
 			assigned_routes['{}_text'.format(k)] = assigned_routes[k].apply(lambda x: to_timestr(x))
 
 		assigned_routes['total_cost_text'] = assigned_routes['total_cost'].apply(lambda x: '{:,.1f} {}'.format(x, self.currency))

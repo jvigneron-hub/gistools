@@ -57,6 +57,7 @@ import h3pandas
 
 from copy import copy, deepcopy
 from math import radians, cos, sin, asin, sqrt
+from shapely import wkt
 from shapely.ops import nearest_points, cascaded_union
 from shapely.geometry import MultiLineString, Polygon, MultiPoint
 from pandas.core.frame import DataFrame
@@ -287,9 +288,14 @@ def to_shapely(points):
 
 def to_geo(data: DataFrame, from_=('longitude', 'latitude'), epsg=4326) -> geopandas.GeoDataFrame:
 	if from_ == 'geometry':
-		gdf = geopandas.GeoDataFrame(
-			data=data, geometry=data['geometry'], crs="EPSG:{}".format(epsg)
-		)
+		if isinstance(data.iloc[0]['geometry'], str):
+			gdf = geopandas.GeoDataFrame(
+				data=data, geometry=data['geometry'].apply(wkt.loads), crs="EPSG:{}".format(epsg)
+			)
+		else:
+			gdf = geopandas.GeoDataFrame(
+				data=data, geometry=data['geometry'], crs="EPSG:{}".format(epsg)
+			)
 
 	else:
 		gdf = geopandas.GeoDataFrame(

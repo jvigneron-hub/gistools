@@ -68,6 +68,7 @@ The module aims to be user-friendly and concise, offering convenient solutions f
 * `split_listoftuples`: Splits a list of tuples into separate lists based on their elements.
 * `find_duplicates`: Finds duplicate elements in a list.
 * `add_to`: Adds a value to each element in a list.
+* `generate_list_of_integers`: Generates a sorted list of unique integers from a sequence of strings.
 
 **Dictionnaries**
 * `merge_dicts`: Merges two dictionaries, giving preference to values from dict2 in case of key conflicts.
@@ -90,6 +91,7 @@ The module aims to be user-friendly and concise, offering convenient solutions f
 * `select`: Applies a mapping from an enumeration to a list, NumPy array, or Pandas DataFrame column.
 * `reformat_date`: Reformats a date column in a Pandas DataFrame from one format to another.
 * `drop_null_columns`: Drops columns from a Pandas DataFrame where all values are null (NaN).
+* `duplicate_row`: Duplicates a specific row in a pandas DataFrame.
 
 **I/O**
 * `ospathextension`: Gets the file extension from a filename.
@@ -860,6 +862,33 @@ def add_to(l, value):
 	"""
 	return list(map(lambda x: x+value, l))
 
+def generate_list_of_integers(sequence, sep=','):
+	"""
+	Generates a sorted list of unique integers from a sequence of strings.
+
+	Args:
+	- **sequence (str)**: A sequence of strings containing comma-separated integers.
+	- **sep (str, optional)**: The delimiter used to separate the integers. Defaults to ','.
+
+	Returns:
+	- A sorted **list** of unique integers.
+	"""
+
+	# Initialize an empty list to store the numbers.
+	numbers = []
+
+	# Iterate over each string in the sequence.
+	for item in sequence:
+		if len(item) > 0:
+			# Split the string by commas and convert each element to an integer.
+			for num_str in item.split(sep):
+				numbers.append(int(num_str))
+
+	# Remove duplicates and sort the list.
+	unique_numbers = sorted(list(set(numbers)))
+
+	return unique_numbers
+
 #------------------------------------------------------------------------------
 # Dictionnaries
 #------------------------------------------------------------------------------
@@ -1216,6 +1245,26 @@ def drop_null_columns(df, columns=None):
 			columns_to_drop.remove(c)
 
 	return df.drop(columns=columns_to_drop)
+
+def duplicate_row(df, index, num_duplicates=1):
+	"""
+	Duplicates a specific row in a pandas DataFrame.
+
+	Args:
+	- **df**: The pandas DataFrame.
+	- **index**: The index of the row to duplicate.
+	- **num_duplicates**: The number of times to duplicate the row.
+
+	Returns:
+	- **pandas DataFrame** with the duplicated row(s).
+	"""
+	# Get the row to duplicate
+	row = df.loc[[index]]
+
+	# Concatenate the row with the original DataFrame
+	new_df = pandas.concat([df, row.loc[row.index.repeat(num_duplicates)]], ignore_index=True)
+
+	return new_df
 
 #------------------------------------------------------------------------------
 # I/O
